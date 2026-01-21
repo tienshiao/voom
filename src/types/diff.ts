@@ -3,11 +3,17 @@ export interface DiffResponse {
   directory: string;
 }
 
+export interface TextSegment {
+  text: string;
+  highlighted: boolean;
+}
+
 export interface DiffLine {
   type: "context" | "addition" | "deletion" | "hunk-header";
   content: string;
   oldLineNum?: number;
   newLineNum?: number;
+  segments?: TextSegment[];
 }
 
 export interface DiffHunk {

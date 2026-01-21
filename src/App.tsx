@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { FileTree } from "./components/FileTree";
 import { DiffFile } from "./components/DiffFile";
 import { parseDiff } from "./utils/parseDiff";
+import { enhanceWithWordDiff } from "./utils/wordDiff";
 import type { DiffResponse, FileDiff } from "./types/diff";
 import "./index.css";
 
@@ -70,7 +71,8 @@ export function App() {
 
       setDiffData(data);
       const parsed = parseDiff(data.diff);
-      setFiles(parsed);
+      const enhanced = enhanceWithWordDiff(parsed);
+      setFiles(enhanced);
       setExpandedFiles(new Set(parsed.map((f) => f.newPath)));
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));

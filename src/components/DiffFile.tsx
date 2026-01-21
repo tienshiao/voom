@@ -69,7 +69,24 @@ export function DiffFile({ file, isExpanded, onToggle }: DiffFileProps) {
                                 ? "-"
                                 : " "}
                           </span>
-                          <span className="line-text">{line.content}</span>
+                          <span className="line-text">
+                            {line.segments ? (
+                              line.segments.map((seg, i) => (
+                                <span
+                                  key={i}
+                                  className={
+                                    seg.highlighted
+                                      ? `word-highlight-${line.type}`
+                                      : ""
+                                  }
+                                >
+                                  {seg.text}
+                                </span>
+                              ))
+                            ) : (
+                              line.content
+                            )}
+                          </span>
                         </td>
                       </>
                     )}

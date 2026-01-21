@@ -352,6 +352,16 @@ body {
   user-select: none;
 }
 
+.word-highlight-addition {
+  background-color: #6fdd8b;
+  border-radius: 2px;
+}
+
+.word-highlight-deletion {
+  background-color: #ffaba8;
+  border-radius: 2px;
+}
+
 .loading,
 .error,
 .empty-state {
