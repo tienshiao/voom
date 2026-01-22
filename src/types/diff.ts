@@ -32,3 +32,21 @@ export interface FileDiff {
   additions: number;
   deletions: number;
 }
+
+export interface ContextRequest {
+  filePath: string;
+  startLine: number;
+  endLine: number;
+}
+
+export interface ContextResponse {
+  lines: { lineNum: number; content: string }[];
+  hasMore: boolean;
+}
+
+export interface HunkExpansionState {
+  beforeLines: DiffLine[];
+  afterLines: DiffLine[];
+  canExpandBefore: boolean;
+  canExpandAfter: boolean;
+}

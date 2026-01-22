@@ -431,6 +431,60 @@ body {
   background: #2c974b;
 }
 
+/* Expand context rows */
+.expand-row {
+  background: #f6f8fa;
+  cursor: pointer;
+}
+
+.expand-row:hover {
+  background: #ddf4ff;
+}
+
+.expand-row:hover .expand-line-num,
+.expand-row:hover .expand-content {
+  background: #ddf4ff;
+}
+
+.expand-line-num {
+  background: #f6f8fa;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.expand-icon-wrapper {
+  color: #656d76;
+  font-size: 11px;
+}
+
+.expand-row:hover .expand-icon-wrapper {
+  color: #0969da;
+}
+
+.expand-content {
+  background: #f6f8fa;
+  padding: 0 8px;
+}
+
+.expand-dots {
+  color: #656d76;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+
+.expand-row:hover .expand-dots {
+  color: #0969da;
+}
+
+/* Expanded context lines */
+.expanded-context {
+  background: #f0f6fc;
+}
+
+.expanded-context .line-num {
+  background: #e6edf5;
+}
+
 @media (max-width: 768px) {
   .diff-viewer {
     flex-direction: column;
