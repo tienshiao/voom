@@ -51,3 +51,14 @@ export interface HunkExpansionState {
   canExpandBefore: boolean;
   canExpandAfter: boolean;
 }
+
+export interface LineComment {
+  id: string;
+  filePath: string;
+  lineNumber: number;
+  lineType: 'addition' | 'deletion' | 'context';
+  hunkIndex: number;
+  content: string;
+  createdAt: number;
+  updatedAt: number;
+}

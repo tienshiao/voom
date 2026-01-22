@@ -3,6 +3,7 @@ import { FileTree } from "./components/FileTree";
 import { DiffFile } from "./components/DiffFile";
 import { parseDiff } from "./utils/parseDiff";
 import { enhanceWithWordDiff } from "./utils/wordDiff";
+import { useComments } from "./hooks/useComments";
 import type { DiffResponse, FileDiff, DiffHunk, HunkExpansionState, DiffLine } from "./types/diff";
 import "./index.css";
 
@@ -14,6 +15,7 @@ export function App() {
   const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [hunkExpansions, setHunkExpansions] = useState<Map<string, HunkExpansionState>>(new Map());
+  const commentState = useComments();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isScrollingToFile = useRef(false);
 
@@ -336,6 +338,7 @@ export function App() {
                 onToggle={() => toggleFile(file.newPath)}
                 hunkExpansions={hunkExpansions}
                 onExpandContext={expandHunkContext}
+                commentState={commentState}
               />
             </div>
           ))}

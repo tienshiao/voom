@@ -1,6 +1,9 @@
 import React from "react";
-import { ChevronDown, ChevronRight, ChevronUp, MoreHorizontal } from "lucide-react";
-import type { FileDiff, DiffHunk, HunkExpansionState, DiffLine } from "../types/diff";
+import { ChevronDown, ChevronRight, ChevronUp, MoreHorizontal, Plus } from "lucide-react";
+import { CommentInput } from "./CommentInput";
+import { CommentDisplay } from "./CommentDisplay";
+import type { FileDiff, DiffHunk, HunkExpansionState, DiffLine, LineComment } from "../types/diff";
+import type { UseCommentsReturn } from "../hooks/useComments";
 
 interface DiffFileProps {
   file: FileDiff;
@@ -15,6 +18,7 @@ interface DiffFileProps {
     prevHunk: DiffHunk | null,
     nextHunk: DiffHunk | null
   ) => void;
+  commentState: UseCommentsReturn;
 }
 
 function ExpandButton({
@@ -44,16 +48,80 @@ function ExpandButton({
   );
 }
 
-function ContextLine({ line }: { line: DiffLine }) {
+interface ContextLineProps {
+  line: DiffLine;
+  filePath: string;
+  hunkIndex: number;
+  commentKey: string;
+  comment?: LineComment;
+  isActive: boolean;
+  isEditing: boolean;
+  isDeleteConfirm: boolean;
+  onOpenComment: () => void;
+  onSaveComment: (content: string) => void;
+  onCancelComment: () => void;
+  onEditComment: () => void;
+  onRequestDelete: () => void;
+  onConfirmDelete: () => void;
+  onCancelDelete: () => void;
+}
+
+function ContextLine({
+  line,
+  commentKey,
+  comment,
+  isActive,
+  isEditing,
+  isDeleteConfirm,
+  onOpenComment,
+  onSaveComment,
+  onCancelComment,
+  onEditComment,
+  onRequestDelete,
+  onConfirmDelete,
+  onCancelDelete,
+}: ContextLineProps) {
   return (
-    <tr className="diff-line diff-line-context expanded-context">
-      <td className="line-num line-num-old">{line.oldLineNum ?? ""}</td>
-      <td className="line-num line-num-new">{line.newLineNum ?? ""}</td>
-      <td className="line-content">
-        <span className="line-prefix"> </span>
-        <span className="line-text">{line.content}</span>
-      </td>
-    </tr>
+    <>
+      <tr className="diff-line diff-line-context expanded-context">
+        <td className="line-num line-num-old">
+          <button
+            className="add-comment-btn"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOpenComment();
+            }}
+            title="Add comment"
+          >
+            <Plus size={14} />
+          </button>
+          {line.oldLineNum ?? ""}
+        </td>
+        <td className="line-num line-num-new">{line.newLineNum ?? ""}</td>
+        <td className="line-content">
+          <span className="line-prefix"> </span>
+          <span className="line-text">{line.content}</span>
+        </td>
+      </tr>
+      {comment && !isActive && (
+        <CommentDisplay
+          comment={comment}
+          commentKey={commentKey}
+          onEdit={onEditComment}
+          onRequestDelete={onRequestDelete}
+          onConfirmDelete={onConfirmDelete}
+          onCancelDelete={onCancelDelete}
+          isDeleteConfirm={isDeleteConfirm}
+        />
+      )}
+      {isActive && (
+        <CommentInput
+          initialContent={isEditing ? comment?.content : undefined}
+          onSave={onSaveComment}
+          onCancel={onCancelComment}
+        />
+      )}
+    </>
   );
 }
 
@@ -63,12 +131,31 @@ export function DiffFile({
   onToggle,
   hunkExpansions,
   onExpandContext,
+  commentState,
 }: DiffFileProps) {
+  const {
+    comments,
+    activeCommentLines,
+    editingCommentId,
+    deleteConfirmId,
+    openComment,
+    saveComment,
+    cancelComment,
+    editComment,
+    requestDelete,
+    confirmDelete,
+    cancelDelete,
+  } = commentState;
+
   const total = file.additions + file.deletions;
   const additionWidth = total > 0 ? (file.additions / total) * 100 : 0;
 
   // Use newPath for file reading (handles new files from /dev/null)
   const filePath = file.newPath;
+
+  const getCommentKey = (lineNumber: number, lineType: string) => {
+    return `${filePath}:${lineNumber}:${lineType}`;
+  };
 
   const shouldShowExpandBefore = (hunkIndex: number, hunk: DiffHunk) => {
     const prevHunk = hunkIndex > 0 ? file.hunks[hunkIndex - 1] : null;
@@ -188,18 +275,44 @@ export function DiffFile({
                     )}
 
                     {/* Expanded context lines before hunk */}
-                    {expansion?.beforeLines.map((line, lineIdx) => (
-                      <ContextLine key={`before-${hunkIdx}-${lineIdx}`} line={line} />
-                    ))}
+                    {expansion?.beforeLines.map((line, lineIdx) => {
+                      const lineNum = line.newLineNum!;
+                      const commentKey = getCommentKey(lineNum, "context");
+                      const comment = comments.get(commentKey);
+                      const isActive = activeCommentLines.has(commentKey);
+                      const isEditing = isActive && editingCommentId !== null;
+                      const isDeleteConfirm = comment && deleteConfirmId === comment.id;
+
+                      return (
+                        <ContextLine
+                          key={`before-${hunkIdx}-${lineIdx}`}
+                          line={line}
+                          filePath={filePath}
+                          hunkIndex={hunkIdx}
+                          commentKey={commentKey}
+                          comment={comment}
+                          isActive={isActive}
+                          isEditing={isEditing}
+                          isDeleteConfirm={!!isDeleteConfirm}
+                          onOpenComment={() => openComment(filePath, lineNum, "context")}
+                          onSaveComment={(content) => saveComment(filePath, lineNum, "context", hunkIdx, content)}
+                          onCancelComment={() => cancelComment(commentKey)}
+                          onEditComment={() => editComment(commentKey)}
+                          onRequestDelete={() => comment && requestDelete(comment.id)}
+                          onConfirmDelete={() => confirmDelete(commentKey)}
+                          onCancelDelete={cancelDelete}
+                        />
+                      );
+                    })}
 
                     {/* Hunk header and lines */}
-                    {hunk.lines.map((line, lineIdx) => (
-                      <tr
-                        key={`${hunkIdx}-${lineIdx}`}
-                        className={`diff-line diff-line-${line.type}`}
-                      >
-                        {line.type === "hunk-header" ? (
-                          <>
+                    {hunk.lines.map((line, lineIdx) => {
+                      if (line.type === "hunk-header") {
+                        return (
+                          <tr
+                            key={`${hunkIdx}-${lineIdx}`}
+                            className="diff-line diff-line-hunk-header"
+                          >
                             <td className="line-num hunk-line-num" colSpan={2}>
                               <span className="hunk-expand"><MoreHorizontal size={14} /></span>
                             </td>
@@ -210,10 +323,35 @@ export function DiffFile({
                               </span>
                               <span className="hunk-context">{line.content}</span>
                             </td>
-                          </>
-                        ) : (
-                          <>
+                          </tr>
+                        );
+                      }
+
+                      // For actual diff lines (addition, deletion, context)
+                      const lineType = line.type as 'addition' | 'deletion' | 'context';
+                      const lineNum = line.newLineNum ?? line.oldLineNum;
+                      const commentKey = lineNum ? getCommentKey(lineNum, lineType) : null;
+                      const comment = commentKey ? comments.get(commentKey) : undefined;
+                      const isActive = commentKey ? activeCommentLines.has(commentKey) : false;
+                      const isEditing = isActive && editingCommentId !== null;
+                      const isDeleteConfirm = comment && deleteConfirmId === comment.id;
+
+                      return (
+                        <React.Fragment key={`${hunkIdx}-${lineIdx}`}>
+                          <tr className={`diff-line diff-line-${line.type}`}>
                             <td className="line-num line-num-old">
+                              {lineNum && (
+                                <button
+                                  className="add-comment-btn"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    openComment(filePath, lineNum, lineType);
+                                  }}
+                                  title="Add comment"
+                                >
+                                  <Plus size={14} />
+                                </button>
+                              )}
                               {line.oldLineNum ?? ""}
                             </td>
                             <td className="line-num line-num-new">
@@ -246,15 +384,59 @@ export function DiffFile({
                                 )}
                               </span>
                             </td>
-                          </>
-                        )}
-                      </tr>
-                    ))}
+                          </tr>
+                          {comment && !isActive && commentKey && (
+                            <CommentDisplay
+                              comment={comment}
+                              commentKey={commentKey}
+                              onEdit={() => editComment(commentKey)}
+                              onRequestDelete={() => requestDelete(comment.id)}
+                              onConfirmDelete={() => confirmDelete(commentKey)}
+                              onCancelDelete={cancelDelete}
+                              isDeleteConfirm={!!isDeleteConfirm}
+                            />
+                          )}
+                          {isActive && commentKey && lineNum && (
+                            <CommentInput
+                              initialContent={isEditing ? comment?.content : undefined}
+                              onSave={(content) => saveComment(filePath, lineNum, lineType, hunkIdx, content)}
+                              onCancel={() => cancelComment(commentKey)}
+                            />
+                          )}
+                        </React.Fragment>
+                      );
+                    })}
 
                     {/* Expanded context lines after hunk */}
-                    {expansion?.afterLines.map((line, lineIdx) => (
-                      <ContextLine key={`after-${hunkIdx}-${lineIdx}`} line={line} />
-                    ))}
+                    {expansion?.afterLines.map((line, lineIdx) => {
+                      const lineNum = line.newLineNum!;
+                      const commentKey = getCommentKey(lineNum, "context");
+                      const comment = comments.get(commentKey);
+                      const isActive = activeCommentLines.has(commentKey);
+                      const isEditing = isActive && editingCommentId !== null;
+                      const isDeleteConfirm = comment && deleteConfirmId === comment.id;
+
+                      return (
+                        <ContextLine
+                          key={`after-${hunkIdx}-${lineIdx}`}
+                          line={line}
+                          filePath={filePath}
+                          hunkIndex={hunkIdx}
+                          commentKey={commentKey}
+                          comment={comment}
+                          isActive={isActive}
+                          isEditing={isEditing}
+                          isDeleteConfirm={!!isDeleteConfirm}
+                          onOpenComment={() => openComment(filePath, lineNum, "context")}
+                          onSaveComment={(content) => saveComment(filePath, lineNum, "context", hunkIdx, content)}
+                          onCancelComment={() => cancelComment(commentKey)}
+                          onEditComment={() => editComment(commentKey)}
+                          onRequestDelete={() => comment && requestDelete(comment.id)}
+                          onConfirmDelete={() => confirmDelete(commentKey)}
+                          onCancelDelete={cancelDelete}
+                        />
+                      );
+                    })}
 
                     {/* Expand after button */}
                     {showExpandAfter && (
