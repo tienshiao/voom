@@ -1,6 +1,33 @@
 import { serve, type Server } from "bun";
 import index from "./index.html";
 
+// Get full diff including untracked files
+async function getFullDiff(dir: string): Promise<string> {
+  // 1. Get regular diff for tracked files
+  const trackedDiff = await Bun.$`git -C ${dir} diff`.quiet().text();
+
+  // 2. Get list of untracked files
+  const untrackedResult = await Bun.$`git -C ${dir} ls-files --others --exclude-standard`.quiet();
+  const untrackedFiles = untrackedResult.text().trim().split('\n').filter(Boolean);
+
+  // 3. Generate diff for each untracked file
+  const untrackedDiffs: string[] = [];
+  for (const file of untrackedFiles) {
+    const filePath = `${dir}/${file}`;
+    // git diff --no-index exits with 1 when files differ, so we handle that
+    const result = await Bun.$`git diff --no-index /dev/null ${filePath}`.quiet().nothrow();
+    if (result.stdout.length > 0) {
+      // Fix paths in the diff output (replace /dev/null and absolute paths)
+      let diff = result.text();
+      diff = diff.replace(/a\/dev\/null/g, 'a/' + file);
+      diff = diff.replace(new RegExp('b' + filePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), 'b/' + file);
+      untrackedDiffs.push(diff);
+    }
+  }
+
+  return trackedDiff + untrackedDiffs.join('');
+}
+
 // Configuration
 const DEFAULT_PORT = parseInt(process.env.PORT || "3010", 10);
 const MAX_PORT_ATTEMPTS = 10;
@@ -17,9 +44,9 @@ const serverConfig = {
     "/api/diff": {
       async GET(req: Request) {
         try {
-          const result = await Bun.$`git -C ${targetDir} diff`.quiet();
+          const diff = await getFullDiff(targetDir);
           return Response.json({
-            diff: result.text(),
+            diff,
             directory: targetDir,
           });
         } catch (error) {
