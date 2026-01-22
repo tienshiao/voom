@@ -15,11 +15,14 @@ by Claude (my AI of choice).
 ## Features
 
 - View uncommitted git changes (tracked and untracked files) in a GitHub-style diff viewer
-- File tree sidebar with filtering
+- File tree sidebar with collapsible directories and filtering
 - Word-level diff highlighting
+- Image diff support
 - Expandable context around diff hunks
 - Add comments on any line
+- Track files as viewed with progress indicator
 - Generate markdown prompts from comments for AI coding assistants
+- Single-file mode for large diffs (auto-enabled for 30+ files or 1500+ changed lines, with keyboard navigation via ←/→)
 
 ## Usage
 
