@@ -41,6 +41,19 @@ export function parseDiff(diffText: string): FileDiff[] {
     // New file path
     if (line.startsWith("+++ ")) {
       currentFile.newPath = line.slice(4).replace(/^b\//, "");
+
+      // Determine file status and handle special paths
+      if (currentFile.newPath === "/dev/null") {
+        // Deleted file: use oldPath as the display path
+        currentFile.status = "deleted";
+        currentFile.newPath = currentFile.oldPath;
+      } else if (currentFile.oldPath === "/dev/null") {
+        // Added file
+        currentFile.status = "added";
+      } else {
+        // Modified file
+        currentFile.status = "modified";
+      }
       continue;
     }
 

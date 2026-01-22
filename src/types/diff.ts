@@ -28,6 +28,7 @@ export interface DiffHunk {
 export interface FileDiff {
   oldPath: string;
   newPath: string;
+  status?: "added" | "deleted" | "modified";
   hunks: DiffHunk[];
   additions: number;
   deletions: number;
