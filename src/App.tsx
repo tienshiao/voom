@@ -72,6 +72,8 @@ export function App() {
       setDiffData(data);
       const parsed = parseDiff(data.diff);
       const enhanced = enhanceWithWordDiff(parsed);
+      // Sort files by path to match tree rendering order
+      enhanced.sort((a, b) => a.newPath.localeCompare(b.newPath));
       setFiles(enhanced);
       setExpandedFiles(new Set(parsed.map((f) => f.newPath)));
     } catch (err) {
