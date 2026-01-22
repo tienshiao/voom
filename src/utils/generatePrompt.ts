@@ -86,8 +86,6 @@ export function generatePrompt({ comments, files, hunkExpansions }: GenerateProm
   const sortedFiles = Array.from(commentsByFile.keys()).sort();
 
   const lines: string[] = [
-    "# Code Review Feedback",
-    "",
     "Please address the following code review comments:",
     "",
   ];
@@ -100,13 +98,10 @@ export function generatePrompt({ comments, files, hunkExpansions }: GenerateProm
     // Sort line comments by line number
     lineComments.sort((a, b) => (a.lineNumber ?? 0) - (b.lineNumber ?? 0));
 
-    lines.push(`## File: ${filePath}`);
-    lines.push("");
-
     // File-level comments first
     for (const comment of fileLevelComments) {
-      lines.push(`### File Comment`);
-      lines.push(`**Comment:** ${comment.content}`);
+      lines.push(`File: ${filePath}`);
+      lines.push(`Review comment: ${comment.content}`);
       lines.push("");
     }
 
@@ -119,8 +114,6 @@ export function generatePrompt({ comments, files, hunkExpansions }: GenerateProm
             ? "deletion"
             : "context";
 
-      lines.push(`### Line ${comment.lineNumber} (${lineTypeLabel})`);
-
       const lineContent = getLineContent(
         comment.filePath,
         comment.lineNumber!,
@@ -129,14 +122,13 @@ export function generatePrompt({ comments, files, hunkExpansions }: GenerateProm
         hunkExpansions
       );
 
+      lines.push(`File: ${filePath}`);
+      lines.push(`Line number: ${comment.lineNumber}`);
+      lines.push(`Line type: ${lineTypeLabel}`);
       if (lineContent) {
-        const ext = getFileExtension(filePath);
-        lines.push("```" + ext);
-        lines.push(lineContent);
-        lines.push("```");
+        lines.push(`Line content: ${lineContent}`);
       }
-
-      lines.push(`**Comment:** ${comment.content}`);
+      lines.push(`Review comment: ${comment.content}`);
       lines.push("");
     }
   }
