@@ -1,4 +1,5 @@
 import React from "react";
+import { ChevronDown, ChevronRight, ChevronUp, MoreHorizontal } from "lucide-react";
 import type { FileDiff, DiffHunk, HunkExpansionState, DiffLine } from "../types/diff";
 
 interface DiffFileProps {
@@ -33,7 +34,7 @@ function ExpandButton({
     >
       <td className="line-num expand-line-num" colSpan={2}>
         <span className="expand-icon-wrapper">
-          {direction === "before" ? "+" : "+"}
+          {direction === "before" ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
         </span>
       </td>
       <td className="line-content expand-content">
@@ -144,7 +145,9 @@ export function DiffFile({
   return (
     <div className="diff-file">
       <div className="diff-file-header" onClick={onToggle}>
-        <span className="expand-icon">{isExpanded ? "▼" : "▶"}</span>
+        <span className="expand-icon">
+          {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+        </span>
         <span className="change-indicator">
           <span
             className="change-bar addition-bar"
@@ -198,7 +201,7 @@ export function DiffFile({
                         {line.type === "hunk-header" ? (
                           <>
                             <td className="line-num hunk-line-num" colSpan={2}>
-                              <span className="hunk-expand">⋯</span>
+                              <span className="hunk-expand"><MoreHorizontal size={14} /></span>
                             </td>
                             <td className="line-content hunk-content">
                               <span className="hunk-range">
