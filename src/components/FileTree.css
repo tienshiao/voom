@@ -64,6 +64,21 @@
   font-weight: 600;
 }
 
+.tree-chevron {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #656d76;
+  margin-right: 2px;
+}
+
+.tree-folder:hover .tree-chevron {
+  color: #24292f;
+}
+
 .tree-icon {
   width: 16px;
   height: 16px;

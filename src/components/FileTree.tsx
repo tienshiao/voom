@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ChevronRight, ChevronDown } from "lucide-react";
 import type { FileDiff } from "../types/diff";
 import { FileIcon } from "./FileIcon";
 import "./FileTree.css";
@@ -11,6 +12,8 @@ interface FileTreeProps {
 
 export function FileTree({ files, selectedFile, onSelectFile }: FileTreeProps) {
   const [filter, setFilter] = useState("");
+  const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
+  const [hasInitialized, setHasInitialized] = useState(false);
 
   const filteredFiles = filter
     ? files.filter((file) =>
@@ -33,6 +36,61 @@ export function FileTree({ files, selectedFile, onSelectFile }: FileTreeProps) {
     return tree;
   };
 
+  const getAllDirectoryPaths = (node: Record<string, any>, path: string = ""): string[] => {
+    const paths: string[] = [];
+    Object.entries(node).forEach(([key, value]) => {
+      if (key === "__file") return;
+      const fullPath = path ? `${path}/${key}` : key;
+      const isFile = value.__file;
+      if (!isFile) {
+        paths.push(fullPath);
+        paths.push(...getAllDirectoryPaths(value, fullPath));
+      }
+    });
+    return paths;
+  };
+
+  const tree = buildTree(filteredFiles);
+
+  // Expand all directories on initial load
+  useEffect(() => {
+    if (!hasInitialized && files.length > 0) {
+      const allPaths = getAllDirectoryPaths(buildTree(files));
+      setExpandedPaths(new Set(allPaths));
+      setHasInitialized(true);
+    }
+  }, [files, hasInitialized]);
+
+  // Auto-expand parent directories when a file is selected
+  useEffect(() => {
+    if (selectedFile) {
+      const parts = selectedFile.split("/");
+      const parentPaths: string[] = [];
+      for (let i = 1; i < parts.length; i++) {
+        parentPaths.push(parts.slice(0, i).join("/"));
+      }
+      if (parentPaths.length > 0) {
+        setExpandedPaths(prev => {
+          const next = new Set(prev);
+          parentPaths.forEach(p => next.add(p));
+          return next;
+        });
+      }
+    }
+  }, [selectedFile]);
+
+  const toggleDirectory = (path: string) => {
+    setExpandedPaths(prev => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+      }
+      return next;
+    });
+  };
+
   const renderTree = (
     node: Record<string, any>,
     path: string = "",
@@ -43,6 +101,7 @@ export function FileTree({ files, selectedFile, onSelectFile }: FileTreeProps) {
       const fullPath = path ? `${path}/${key}` : key;
       const isFile = value.__file;
       const file = value.__file as FileDiff | undefined;
+      const isExpanded = expandedPaths.has(fullPath);
 
       return (
         <div key={fullPath}>
@@ -51,8 +110,13 @@ export function FileTree({ files, selectedFile, onSelectFile }: FileTreeProps) {
               selectedFile === file?.newPath ? "selected" : ""
             }`}
             style={{ paddingLeft: `${depth * 16 + 8}px` }}
-            onClick={() => isFile && onSelectFile(file!.newPath)}
+            onClick={() => isFile ? onSelectFile(file!.newPath) : toggleDirectory(fullPath)}
           >
+            {!isFile && (
+              <span className="tree-chevron">
+                {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+              </span>
+            )}
             <span className="tree-icon">
               <FileIcon filename={key} isFolder={!isFile} />
             </span>
@@ -70,13 +134,11 @@ export function FileTree({ files, selectedFile, onSelectFile }: FileTreeProps) {
               />
             )}
           </div>
-          {!isFile && renderTree(value, fullPath, depth + 1)}
+          {!isFile && isExpanded && renderTree(value, fullPath, depth + 1)}
         </div>
       );
     });
   };
-
-  const tree = buildTree(filteredFiles);
 
   return (
     <div className="file-tree">
