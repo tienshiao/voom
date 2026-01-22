@@ -80,6 +80,16 @@ function parseDiffPathLine(line: string, prefix: string): string {
   return content.replace(/^[ab]\//, "");
 }
 
+// Image file extensions
+const IMAGE_EXTENSIONS = new Set([
+  "png", "jpg", "jpeg", "gif", "svg", "webp", "ico", "bmp", "tiff", "tif"
+]);
+
+function isImageFile(path: string): boolean {
+  const ext = path.split(".").pop()?.toLowerCase() || "";
+  return IMAGE_EXTENSIONS.has(ext);
+}
+
 export function parseDiff(diffText: string): FileDiff[] {
   const files: FileDiff[] = [];
   const lines = diffText.split("\n");
@@ -135,6 +145,17 @@ export function parseDiff(diffText: string): FileDiff[] {
     // Detect deleted file mode (for empty deleted files without ---/+++ lines)
     if (line.startsWith("deleted file mode")) {
       currentFile.status = "deleted";
+      continue;
+    }
+
+    // Detect binary files
+    if (line.startsWith("Binary files")) {
+      currentFile.isBinary = true;
+      // Check if it's an image file based on the path
+      const filePath = currentFile.newPath || currentFile.oldPath;
+      if (filePath && isImageFile(filePath)) {
+        currentFile.isImage = true;
+      }
       continue;
     }
 

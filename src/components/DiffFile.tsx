@@ -2,6 +2,7 @@ import React from "react";
 import { ChevronDown, ChevronRight, ChevronUp, MoreHorizontal, Plus } from "lucide-react";
 import { CommentInput } from "./CommentInput";
 import { CommentDisplay } from "./CommentDisplay";
+import { ImageDiff } from "./ImageDiff";
 import type { FileDiff, DiffHunk, HunkExpansionState, DiffLine, LineComment } from "../types/diff";
 import type { UseCommentsReturn } from "../hooks/useComments";
 
@@ -251,7 +252,12 @@ export function DiffFile({
           <span className="stat-del">-{file.deletions}</span>
         </span>
       </div>
-      {isExpanded && (
+      {isExpanded && file.isImage && (
+        <div className="diff-content">
+          <ImageDiff file={file} />
+        </div>
+      )}
+      {isExpanded && !file.isImage && (
         <div className="diff-content">
           <table className="diff-table">
             <tbody>

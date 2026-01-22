@@ -32,6 +32,8 @@ export interface FileDiff {
   hunks: DiffHunk[];
   additions: number;
   deletions: number;
+  isBinary?: boolean;
+  isImage?: boolean;
 }
 
 export interface ContextRequest {

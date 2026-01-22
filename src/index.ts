@@ -1,58 +1,6 @@
 import { serve, type Server } from "bun";
 import index from "./index.html";
-
-// Unescape git's quoted path format (handles octal-escaped UTF-8 bytes)
-function unescapeGitPath(path: string): string {
-  // Remove surrounding quotes if present
-  let result = path;
-  if (result.startsWith('"') && result.endsWith('"')) {
-    result = result.slice(1, -1);
-  }
-
-  // Decode octal escape sequences as UTF-8 bytes
-  result = result.replace(/((?:\\[0-7]{3})+)/g, (match) => {
-    const bytes: number[] = [];
-    const octalPattern = /\\([0-7]{3})/g;
-    let octalMatch;
-    while ((octalMatch = octalPattern.exec(match)) !== null) {
-      bytes.push(parseInt(octalMatch[1], 8));
-    }
-    return new TextDecoder().decode(new Uint8Array(bytes));
-  });
-
-  // Handle other common escapes
-  return result
-    .replace(/\\n/g, "\n")
-    .replace(/\\t/g, "\t")
-    .replace(/\\"/g, '"')
-    .replace(/\\\\/g, "\\");
-}
-
-// Get full diff including staged and untracked files
-async function getFullDiff(dir: string): Promise<string> {
-  // 1. Get diff for unstaged changes to tracked files
-  const unstagedDiff = await Bun.$`git -C ${dir} diff`.quiet().text();
-
-  // 2. Get diff for staged changes (including new staged files)
-  const stagedDiff = await Bun.$`git -C ${dir} diff --cached`.quiet().text();
-
-  // 3. Get list of untracked files (may be quoted with octal escapes for special chars)
-  const untrackedResult = await Bun.$`git -C ${dir} ls-files --others --exclude-standard`.quiet();
-  const untrackedFiles = untrackedResult.text().trim().split('\n').filter(Boolean).map(unescapeGitPath);
-
-  // 4. Generate diff for each untracked file
-  const untrackedDiffs: string[] = [];
-  for (const file of untrackedFiles) {
-    // Run git diff from the target directory so paths are relative
-    // git diff --no-index exits with 1 when files differ, so we handle that
-    const result = await Bun.$`git -C ${dir} diff --no-index /dev/null ${file}`.quiet().nothrow();
-    if (result.stdout.length > 0) {
-      untrackedDiffs.push(result.text());
-    }
-  }
-
-  return unstagedDiff + stagedDiff + untrackedDiffs.join('');
-}
+import { createApiRoutes } from "./api/handlers/index";
 
 // Configuration
 const DEFAULT_PORT = parseInt(process.env.PORT || "3010", 10);
@@ -61,97 +9,15 @@ const MAX_PORT_ATTEMPTS = 10;
 // Get target directory from CLI args or use CWD
 const targetDir = Bun.argv[2] || process.cwd();
 
-// Server configuration (without port, which is handled by fallback logic)
+// Server configuration
 const serverConfig = {
   routes: {
-    // Serve index.html for all unmatched routes.
     "/*": index,
-
-    "/api/diff": {
-      async GET(req: Request) {
-        try {
-          const diff = await getFullDiff(targetDir);
-          return Response.json({
-            diff,
-            directory: targetDir,
-          });
-        } catch (error) {
-          return Response.json(
-            {
-              error: "Failed to get git diff",
-              message: error instanceof Error ? error.message : String(error),
-              directory: targetDir,
-            },
-            { status: 500 }
-          );
-        }
-      },
-    },
-
-    "/api/context": {
-      async GET(req: Request) {
-        try {
-          const url = new URL(req.url);
-          const filePath = url.searchParams.get("file");
-          const start = parseInt(url.searchParams.get("start") || "1", 10);
-          const end = parseInt(url.searchParams.get("end") || "1", 10);
-
-          if (!filePath) {
-            return Response.json(
-              { error: "Missing file parameter" },
-              { status: 400 }
-            );
-          }
-
-          const fullPath = `${targetDir}/${filePath}`;
-          const file = Bun.file(fullPath);
-
-          if (!(await file.exists())) {
-            return Response.json(
-              { error: "File not found" },
-              { status: 404 }
-            );
-          }
-
-          const content = await file.text();
-          const allLines = content.split("\n");
-          const totalLines = allLines.length;
-
-          // Clamp line numbers to valid range (1-indexed)
-          const clampedStart = Math.max(1, Math.min(start, totalLines));
-          const clampedEnd = Math.max(1, Math.min(end, totalLines));
-
-          const lines: { lineNum: number; content: string }[] = [];
-          for (let i = clampedStart; i <= clampedEnd; i++) {
-            lines.push({
-              lineNum: i,
-              content: allLines[i - 1] ?? "", // Convert to 0-indexed
-            });
-          }
-
-          return Response.json({
-            lines,
-            hasMore: end < totalLines,
-            totalLines,
-          });
-        } catch (error) {
-          return Response.json(
-            {
-              error: "Failed to read file context",
-              message: error instanceof Error ? error.message : String(error),
-            },
-            { status: 500 }
-          );
-        }
-      },
-    },
+    ...createApiRoutes(targetDir),
   },
 
   development: process.env.NODE_ENV !== "production" && {
-    // Enable browser hot reloading in development
     hmr: true,
-
-    // Echo console logs from the browser to the server
     console: true,
   },
 };
