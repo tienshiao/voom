@@ -22,12 +22,19 @@ export function App() {
   const commentState = useComments();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isScrollingToFile = useRef(false);
+  const [viewMode, setViewMode] = useState<'all' | 'single'>('all');
+
+  // Thresholds for auto-enabling single-file mode
+  const FILE_COUNT_THRESHOLD = 30;
+  const TOTAL_LINES_THRESHOLD = 1500;
 
   useEffect(() => {
     fetchDiff();
   }, []);
 
   useEffect(() => {
+    // Skip observer in single-file mode
+    if (viewMode === 'single') return;
     if (files.length === 0 || !scrollContainerRef.current) return;
 
     const observer = new IntersectionObserver(
@@ -63,7 +70,7 @@ export function App() {
     });
 
     return () => observer.disconnect();
-  }, [files]);
+  }, [files, viewMode]);
 
   useEffect(() => {
     if (diffData?.directory) {
@@ -90,7 +97,18 @@ export function App() {
       // Sort files by path to match tree rendering order
       enhanced.sort((a, b) => a.newPath.localeCompare(b.newPath));
       setFiles(enhanced);
-      setExpandedFiles(new Set(parsed.map((f) => f.newPath)));
+
+      // Auto-enable single-file mode for large diffs
+      const totalLines = enhanced.reduce((sum, f) => sum + f.additions + f.deletions, 0);
+      const shouldAutoEnable = enhanced.length >= FILE_COUNT_THRESHOLD || totalLines >= TOTAL_LINES_THRESHOLD;
+
+      if (shouldAutoEnable) {
+        setViewMode('single');
+        setSelectedFile(enhanced[0]?.newPath ?? null);
+        setExpandedFiles(new Set([enhanced[0]?.newPath]));
+      } else {
+        setExpandedFiles(new Set(parsed.map((f) => f.newPath)));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : String(err));
     } finally {
@@ -138,6 +156,48 @@ export function App() {
       isScrollingToFile.current = false;
     }, 500);
   };
+
+  const navigateToFile = (path: string) => {
+    setSelectedFile(path);
+    setExpandedFiles((prev) => new Set(prev).add(path));
+    if (viewMode === 'all') {
+      const element = document.getElementById(`file-${path.replace(/\//g, "-")}`);
+      element?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  };
+
+  const navigateToPrevFile = () => {
+    if (!selectedFile) return;
+    const currentIndex = files.findIndex((f) => f.newPath === selectedFile);
+    if (currentIndex > 0) {
+      navigateToFile(files[currentIndex - 1].newPath);
+    }
+  };
+
+  const navigateToNextFile = () => {
+    if (!selectedFile) return;
+    const currentIndex = files.findIndex((f) => f.newPath === selectedFile);
+    if (currentIndex < files.length - 1) {
+      navigateToFile(files[currentIndex + 1].newPath);
+    }
+  };
+
+  // Keyboard navigation for single-file mode
+  useEffect(() => {
+    if (viewMode !== 'single') return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) return;
+      if (e.key === 'ArrowLeft') {
+        navigateToPrevFile();
+      } else if (e.key === 'ArrowRight') {
+        navigateToNextFile();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [viewMode, selectedFile, files]);
 
   const expandHunkContext = async (
     filePath: string,
@@ -342,7 +402,7 @@ export function App() {
         <FileTree
           files={files}
           selectedFile={selectedFile}
-          onSelectFile={scrollToFile}
+          onSelectFile={navigateToFile}
         />
       </div>
       <div className="diff-main" ref={scrollContainerRef}>
@@ -351,6 +411,20 @@ export function App() {
           {diffData?.directory && (
             <span className="directory-badge">{diffData.directory}</span>
           )}
+          <div className="view-mode-toggle">
+            <button
+              className={`mode-btn ${viewMode === 'all' ? 'mode-btn-active' : ''}`}
+              onClick={() => setViewMode('all')}
+            >
+              All Files
+            </button>
+            <button
+              className={`mode-btn ${viewMode === 'single' ? 'mode-btn-active' : ''}`}
+              onClick={() => setViewMode('single')}
+            >
+              Single File
+            </button>
+          </div>
           <div className="viewed-progress">
             <progress
               className="viewed-progress-bar"
@@ -369,26 +443,71 @@ export function App() {
             Prompt
           </button>
         </div>
-        <div className="diff-files">
-          {files.map((file) => (
-            <div
-              key={file.newPath}
-              id={`file-${file.newPath.replace(/\//g, "-")}`}
-              data-file-path={file.newPath}
-            >
-              <DiffFile
-                file={file}
-                isExpanded={expandedFiles.has(file.newPath)}
-                isViewed={viewedFiles.has(file.newPath)}
-                onToggle={() => toggleFile(file.newPath)}
-                onToggleViewed={() => toggleViewed(file.newPath)}
-                hunkExpansions={hunkExpansions}
-                onExpandContext={expandHunkContext}
-                commentState={commentState}
-              />
-            </div>
-          ))}
+        <div className={`diff-files ${viewMode === 'single' ? 'diff-files-single' : ''}`}>
+          {viewMode === 'all' ? (
+            files.map((file) => (
+              <div
+                key={file.newPath}
+                id={`file-${file.newPath.replace(/\//g, "-")}`}
+                data-file-path={file.newPath}
+              >
+                <DiffFile
+                  file={file}
+                  isExpanded={expandedFiles.has(file.newPath)}
+                  isViewed={viewedFiles.has(file.newPath)}
+                  onToggle={() => toggleFile(file.newPath)}
+                  onToggleViewed={() => toggleViewed(file.newPath)}
+                  hunkExpansions={hunkExpansions}
+                  onExpandContext={expandHunkContext}
+                  commentState={commentState}
+                />
+              </div>
+            ))
+          ) : (
+            (() => {
+              const file = files.find((f) => f.newPath === selectedFile);
+              return file ? (
+                <div
+                  key={file.newPath}
+                  id={`file-${file.newPath.replace(/\//g, "-")}`}
+                  data-file-path={file.newPath}
+                >
+                  <DiffFile
+                    file={file}
+                    isExpanded={true}
+                    isViewed={viewedFiles.has(file.newPath)}
+                    onToggle={() => toggleFile(file.newPath)}
+                    onToggleViewed={() => toggleViewed(file.newPath)}
+                    hunkExpansions={hunkExpansions}
+                    onExpandContext={expandHunkContext}
+                    commentState={commentState}
+                  />
+                </div>
+              ) : null;
+            })()
+          )}
         </div>
+        {viewMode === 'single' && (
+          <div className="single-file-nav">
+            <button
+              className="nav-btn"
+              onClick={navigateToPrevFile}
+              disabled={!selectedFile || files.findIndex((f) => f.newPath === selectedFile) === 0}
+            >
+              ← Prev
+            </button>
+            <span className="nav-position">
+              {selectedFile ? files.findIndex((f) => f.newPath === selectedFile) + 1 : 0} of {files.length}
+            </span>
+            <button
+              className="nav-btn"
+              onClick={navigateToNextFile}
+              disabled={!selectedFile || files.findIndex((f) => f.newPath === selectedFile) === files.length - 1}
+            >
+              Next →
+            </button>
+          </div>
+        )}
       </div>
       {showPromptModal && (
         <PromptModal
