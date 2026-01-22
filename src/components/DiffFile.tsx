@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronDown, ChevronRight, ChevronUp, MoreHorizontal, Plus } from "lucide-react";
+import { ChevronDown, ChevronRight, ChevronUp, MessageSquare, MoreHorizontal, Plus } from "lucide-react";
 import { CommentInput } from "./CommentInput";
 import { CommentDisplay } from "./CommentDisplay";
 import { ImageDiff } from "./ImageDiff";
@@ -139,8 +139,11 @@ export function DiffFile({
     activeCommentLines,
     editingCommentId,
     deleteConfirmId,
+    getFileCommentKey,
     openComment,
+    openFileComment,
     saveComment,
+    saveFileComment,
     cancelComment,
     editComment,
     requestDelete,
@@ -251,7 +254,52 @@ export function DiffFile({
           <span className="stat-add">+{file.additions}</span>
           <span className="stat-del">-{file.deletions}</span>
         </span>
+        <button
+          className="add-file-comment-btn"
+          onClick={(e) => {
+            e.stopPropagation();
+            openFileComment(filePath);
+          }}
+          title="Add comment on file"
+        >
+          <MessageSquare size={12} />
+          Comment
+        </button>
       </div>
+      {isExpanded && (() => {
+        const fileCommentKey = getFileCommentKey(filePath);
+        const fileComment = comments.get(fileCommentKey);
+        const isFileCommentActive = activeCommentLines.has(fileCommentKey);
+        const isFileCommentEditing = isFileCommentActive && editingCommentId !== null;
+        const isFileCommentDeleteConfirm = fileComment && deleteConfirmId === fileComment.id;
+
+        if (!fileComment && !isFileCommentActive) return null;
+
+        return (
+          <div className="file-comment-section">
+            {fileComment && !isFileCommentActive && (
+              <CommentDisplay
+                comment={fileComment}
+                commentKey={fileCommentKey}
+                onEdit={() => editComment(fileCommentKey)}
+                onRequestDelete={() => requestDelete(fileComment.id)}
+                onConfirmDelete={() => confirmDelete(fileCommentKey)}
+                onCancelDelete={cancelDelete}
+                isDeleteConfirm={!!isFileCommentDeleteConfirm}
+                variant="file"
+              />
+            )}
+            {isFileCommentActive && (
+              <CommentInput
+                initialContent={isFileCommentEditing ? fileComment?.content : undefined}
+                onSave={(content) => saveFileComment(filePath, content)}
+                onCancel={() => cancelComment(fileCommentKey)}
+                variant="file"
+              />
+            )}
+          </div>
+        );
+      })()}
       {isExpanded && file.isImage && (
         <div className="diff-content">
           <ImageDiff file={file} />

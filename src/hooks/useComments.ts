@@ -11,11 +11,21 @@ export function useComments() {
     return `${filePath}:${lineNumber}:${lineType}`;
   }, []);
 
+  const getFileCommentKey = useCallback((filePath: string) => {
+    return `${filePath}:file-level`;
+  }, []);
+
   const openComment = useCallback((filePath: string, lineNumber: number, lineType: string) => {
     const key = getCommentKey(filePath, lineNumber, lineType);
     setActiveCommentLines((prev) => new Set(prev).add(key));
     setDeleteConfirmId(null);
   }, [getCommentKey]);
+
+  const openFileComment = useCallback((filePath: string) => {
+    const key = getFileCommentKey(filePath);
+    setActiveCommentLines((prev) => new Set(prev).add(key));
+    setDeleteConfirmId(null);
+  }, [getFileCommentKey]);
 
   const saveComment = useCallback((
     filePath: string,
@@ -53,6 +63,38 @@ export function useComments() {
     });
     setEditingCommentId(null);
   }, [getCommentKey]);
+
+  const saveFileComment = useCallback((
+    filePath: string,
+    content: string
+  ) => {
+    const key = getFileCommentKey(filePath);
+
+    setComments((prev) => {
+      const existingComment = prev.get(key);
+      const now = Date.now();
+
+      const comment: LineComment = {
+        id: existingComment?.id || crypto.randomUUID(),
+        filePath,
+        lineType: 'file',
+        content,
+        createdAt: existingComment?.createdAt || now,
+        updatedAt: now,
+      };
+
+      const next = new Map(prev);
+      next.set(key, comment);
+      return next;
+    });
+
+    setActiveCommentLines((prev) => {
+      const next = new Set(prev);
+      next.delete(key);
+      return next;
+    });
+    setEditingCommentId(null);
+  }, [getFileCommentKey]);
 
   const cancelComment = useCallback((commentKey: string) => {
     setActiveCommentLines((prev) => {
@@ -95,8 +137,11 @@ export function useComments() {
     editingCommentId,
     deleteConfirmId,
     getCommentKey,
+    getFileCommentKey,
     openComment,
+    openFileComment,
     saveComment,
+    saveFileComment,
     cancelComment,
     editComment,
     requestDelete,

@@ -57,9 +57,9 @@ export interface HunkExpansionState {
 export interface LineComment {
   id: string;
   filePath: string;
-  lineNumber: number;
-  lineType: 'addition' | 'deletion' | 'context';
-  hunkIndex: number;
+  lineNumber?: number;
+  lineType?: 'addition' | 'deletion' | 'context' | 'file';
+  hunkIndex?: number;
   content: string;
   createdAt: number;
   updatedAt: number;

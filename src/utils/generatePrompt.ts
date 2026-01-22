@@ -94,13 +94,24 @@ export function generatePrompt({ comments, files, hunkExpansions }: GenerateProm
 
   for (const filePath of sortedFiles) {
     const fileComments = commentsByFile.get(filePath)!;
-    // Sort comments by line number
-    fileComments.sort((a, b) => a.lineNumber - b.lineNumber);
+    // Separate file-level comments from line comments
+    const fileLevelComments = fileComments.filter(c => c.lineType === 'file' || c.lineNumber === undefined);
+    const lineComments = fileComments.filter(c => c.lineType !== 'file' && c.lineNumber !== undefined);
+    // Sort line comments by line number
+    lineComments.sort((a, b) => (a.lineNumber ?? 0) - (b.lineNumber ?? 0));
 
     lines.push(`## File: ${filePath}`);
     lines.push("");
 
-    for (const comment of fileComments) {
+    // File-level comments first
+    for (const comment of fileLevelComments) {
+      lines.push(`### File Comment`);
+      lines.push(`**Comment:** ${comment.content}`);
+      lines.push("");
+    }
+
+    // Then line comments
+    for (const comment of lineComments) {
       const lineTypeLabel =
         comment.lineType === "addition"
           ? "addition"
@@ -112,8 +123,8 @@ export function generatePrompt({ comments, files, hunkExpansions }: GenerateProm
 
       const lineContent = getLineContent(
         comment.filePath,
-        comment.lineNumber,
-        comment.lineType,
+        comment.lineNumber!,
+        comment.lineType!,
         files,
         hunkExpansions
       );

@@ -556,6 +556,7 @@ body {
   margin: 4px 8px;
   border-radius: 6px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
   box-sizing: border-box;
   width: calc(100vw - 300px - 80px);
   max-width: 100%;
@@ -637,6 +638,7 @@ body {
   margin: 4px 8px;
   border-radius: 6px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
   box-sizing: border-box;
   width: calc(100vw - 300px - 80px);
   max-width: 100%;
@@ -724,6 +726,44 @@ body {
 
 .btn-cancel-delete:hover {
   background: #f6f8fa;
+}
+
+/* File-level comment styles */
+.file-comment-section {
+  padding: 8px 16px;
+  border-bottom: 1px solid #d0d7de;
+  background: #f6f8fa;
+}
+
+.file-comment-input-wrapper,
+.file-comment-display-wrapper {
+  margin: 8px 0;
+}
+
+.file-comment-input-wrapper .comment-input-container,
+.file-comment-display-wrapper .comment-container {
+  width: auto;
+  margin: 0;
+}
+
+.add-file-comment-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: none;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  color: #656d76;
+  font-size: 12px;
+  cursor: pointer;
+  margin-left: 8px;
+}
+
+.add-file-comment-btn:hover {
+  background: #f6f8fa;
+  color: #0969da;
+  border-color: #0969da;
 }
 
 @media (max-width: 768px) {
