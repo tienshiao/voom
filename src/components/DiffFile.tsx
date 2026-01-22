@@ -1,5 +1,5 @@
 import React from "react";
-import { ChevronDown, ChevronRight, ChevronUp, MessageSquare, MoreHorizontal, Plus } from "lucide-react";
+import { Check, ChevronDown, ChevronRight, ChevronUp, MessageSquare, MoreHorizontal, Plus, Square } from "lucide-react";
 import { CommentInput } from "./CommentInput";
 import { CommentDisplay } from "./CommentDisplay";
 import { ImageDiff } from "./ImageDiff";
@@ -9,7 +9,9 @@ import type { UseCommentsReturn } from "../hooks/useComments";
 interface DiffFileProps {
   file: FileDiff;
   isExpanded: boolean;
+  isViewed: boolean;
   onToggle: () => void;
+  onToggleViewed: () => void;
   hunkExpansions: Map<string, HunkExpansionState>;
   onExpandContext: (
     filePath: string,
@@ -129,7 +131,9 @@ function ContextLine({
 export function DiffFile({
   file,
   isExpanded,
+  isViewed,
   onToggle,
+  onToggleViewed,
   hunkExpansions,
   onExpandContext,
   commentState,
@@ -254,6 +258,17 @@ export function DiffFile({
           <span className="stat-add">+{file.additions}</span>
           <span className="stat-del">-{file.deletions}</span>
         </span>
+        <button
+          className={`viewed-checkbox ${isViewed ? 'viewed-checkbox-checked' : ''}`}
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleViewed();
+          }}
+          title={isViewed ? "Mark as not viewed" : "Mark as viewed"}
+        >
+          {isViewed ? <Check size={12} /> : <Square size={12} />}
+          Viewed
+        </button>
         <button
           className="add-file-comment-btn"
           onClick={(e) => {

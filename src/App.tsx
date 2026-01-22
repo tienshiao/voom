@@ -15,6 +15,7 @@ export function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
+  const [viewedFiles, setViewedFiles] = useState<Set<string>>(new Set());
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [hunkExpansions, setHunkExpansions] = useState<Map<string, HunkExpansionState>>(new Map());
   const [showPromptModal, setShowPromptModal] = useState(false);
@@ -104,6 +105,24 @@ export function App() {
         next.delete(path);
       } else {
         next.add(path);
+      }
+      return next;
+    });
+  };
+
+  const toggleViewed = (path: string) => {
+    setViewedFiles((prev) => {
+      const next = new Set(prev);
+      if (next.has(path)) {
+        next.delete(path);
+      } else {
+        next.add(path);
+        // Auto-collapse when marking as viewed
+        setExpandedFiles((prevExpanded) => {
+          const nextExpanded = new Set(prevExpanded);
+          nextExpanded.delete(path);
+          return nextExpanded;
+        });
       }
       return next;
     });
@@ -332,6 +351,16 @@ export function App() {
           {diffData?.directory && (
             <span className="directory-badge">{diffData.directory}</span>
           )}
+          <div className="viewed-progress">
+            <progress
+              className="viewed-progress-bar"
+              value={viewedFiles.size}
+              max={files.length}
+            />
+            <span className="viewed-progress-text">
+              {viewedFiles.size} / {files.length} viewed
+            </span>
+          </div>
           <button
             className="prompt-btn"
             onClick={() => setShowPromptModal(true)}
@@ -350,7 +379,9 @@ export function App() {
               <DiffFile
                 file={file}
                 isExpanded={expandedFiles.has(file.newPath)}
+                isViewed={viewedFiles.has(file.newPath)}
                 onToggle={() => toggleFile(file.newPath)}
+                onToggleViewed={() => toggleViewed(file.newPath)}
                 hunkExpansions={hunkExpansions}
                 onExpandContext={expandHunkContext}
                 commentState={commentState}
