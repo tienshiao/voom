@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { FileDiff } from "../types/diff";
+import { FileIcon } from "./FileIcon";
 
 interface FileTreeProps {
   files: FileDiff[];
@@ -51,7 +52,9 @@ export function FileTree({ files, selectedFile, onSelectFile }: FileTreeProps) {
             style={{ paddingLeft: `${depth * 16 + 8}px` }}
             onClick={() => isFile && onSelectFile(file!.newPath)}
           >
-            <span className="tree-icon">{isFile ? "📄" : "📁"}</span>
+            <span className="tree-icon">
+              <FileIcon filename={key} isFolder={!isFile} />
+            </span>
             <span className="tree-name">{key}</span>
             {isFile && file && (
               <span className="tree-stats">

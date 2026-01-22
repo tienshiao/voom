@@ -130,8 +130,23 @@ body {
 
 .tree-icon {
   width: 16px;
-  text-align: center;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
+
+.file-icon { color: #57606a; }
+.folder-icon { color: #54aeff; }
+.file-icon-ts { color: #3178c6; }
+.file-icon-js { color: #f7df1e; }
+.file-icon-json { color: #cb8b00; }
+.file-icon-css { color: #563d7c; }
+.file-icon-md { color: #083fa1; }
+.file-icon-html { color: #e34c26; }
+.file-icon-image { color: #a855f7; }
+.file-icon-config { color: #6b7280; }
 
 .tree-name {
   flex: 1;
