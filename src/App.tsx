@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { FileTree } from "./components/FileTree";
 import { DiffFile } from "./components/DiffFile";
+import { PromptModal } from "./components/PromptModal";
 import { parseDiff } from "./utils/parseDiff";
 import { enhanceWithWordDiff } from "./utils/wordDiff";
+import { generatePrompt } from "./utils/generatePrompt";
 import { useComments } from "./hooks/useComments";
 import type { DiffResponse, FileDiff, DiffHunk, HunkExpansionState, DiffLine } from "./types/diff";
 import "./index.css";
@@ -15,6 +17,7 @@ export function App() {
   const [expandedFiles, setExpandedFiles] = useState<Set<string>>(new Set());
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [hunkExpansions, setHunkExpansions] = useState<Map<string, HunkExpansionState>>(new Map());
+  const [showPromptModal, setShowPromptModal] = useState(false);
   const commentState = useComments();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isScrollingToFile = useRef(false);
@@ -321,8 +324,12 @@ export function App() {
           {diffData?.directory && (
             <span className="directory-badge">{diffData.directory}</span>
           )}
-          <button className="refresh-btn" onClick={fetchDiff}>
-            Refresh
+          <button
+            className="prompt-btn"
+            onClick={() => setShowPromptModal(true)}
+            disabled={commentState.comments.size === 0}
+          >
+            Prompt
           </button>
         </div>
         <div className="diff-files">
@@ -344,6 +351,12 @@ export function App() {
           ))}
         </div>
       </div>
+      {showPromptModal && (
+        <PromptModal
+          prompt={generatePrompt({ comments: commentState.comments, files, hunkExpansions })}
+          onClose={() => setShowPromptModal(false)}
+        />
+      )}
     </div>
   );
 }
