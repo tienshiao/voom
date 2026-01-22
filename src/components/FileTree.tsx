@@ -62,6 +62,12 @@ export function FileTree({ files, selectedFile, onSelectFile }: FileTreeProps) {
                 <span className="stat-del">-{file.deletions}</span>
               </span>
             )}
+            {isFile && (
+              <span
+                className={`status-dot ${file?.status && file.status !== "modified" ? `status-${file.status}` : ""}`}
+                title={file?.status === "added" ? "Added" : file?.status === "deleted" ? "Deleted" : undefined}
+              />
+            )}
           </div>
           {!isFile && renderTree(value, fullPath, depth + 1)}
         </div>
