@@ -1,31 +1,57 @@
 import { serve, type Server } from "bun";
 import index from "./index.html";
 
-// Get full diff including untracked files
+// Unescape git's quoted path format (handles octal-escaped UTF-8 bytes)
+function unescapeGitPath(path: string): string {
+  // Remove surrounding quotes if present
+  let result = path;
+  if (result.startsWith('"') && result.endsWith('"')) {
+    result = result.slice(1, -1);
+  }
+
+  // Decode octal escape sequences as UTF-8 bytes
+  result = result.replace(/((?:\\[0-7]{3})+)/g, (match) => {
+    const bytes: number[] = [];
+    const octalPattern = /\\([0-7]{3})/g;
+    let octalMatch;
+    while ((octalMatch = octalPattern.exec(match)) !== null) {
+      bytes.push(parseInt(octalMatch[1], 8));
+    }
+    return new TextDecoder().decode(new Uint8Array(bytes));
+  });
+
+  // Handle other common escapes
+  return result
+    .replace(/\\n/g, "\n")
+    .replace(/\\t/g, "\t")
+    .replace(/\\"/g, '"')
+    .replace(/\\\\/g, "\\");
+}
+
+// Get full diff including staged and untracked files
 async function getFullDiff(dir: string): Promise<string> {
-  // 1. Get regular diff for tracked files
-  const trackedDiff = await Bun.$`git -C ${dir} diff`.quiet().text();
+  // 1. Get diff for unstaged changes to tracked files
+  const unstagedDiff = await Bun.$`git -C ${dir} diff`.quiet().text();
 
-  // 2. Get list of untracked files
+  // 2. Get diff for staged changes (including new staged files)
+  const stagedDiff = await Bun.$`git -C ${dir} diff --cached`.quiet().text();
+
+  // 3. Get list of untracked files (may be quoted with octal escapes for special chars)
   const untrackedResult = await Bun.$`git -C ${dir} ls-files --others --exclude-standard`.quiet();
-  const untrackedFiles = untrackedResult.text().trim().split('\n').filter(Boolean);
+  const untrackedFiles = untrackedResult.text().trim().split('\n').filter(Boolean).map(unescapeGitPath);
 
-  // 3. Generate diff for each untracked file
+  // 4. Generate diff for each untracked file
   const untrackedDiffs: string[] = [];
   for (const file of untrackedFiles) {
-    const filePath = `${dir}/${file}`;
+    // Run git diff from the target directory so paths are relative
     // git diff --no-index exits with 1 when files differ, so we handle that
-    const result = await Bun.$`git diff --no-index /dev/null ${filePath}`.quiet().nothrow();
+    const result = await Bun.$`git -C ${dir} diff --no-index /dev/null ${file}`.quiet().nothrow();
     if (result.stdout.length > 0) {
-      // Fix paths in the diff output (replace /dev/null and absolute paths)
-      let diff = result.text();
-      diff = diff.replace(/a\/dev\/null/g, 'a/' + file);
-      diff = diff.replace(new RegExp('b' + filePath.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), 'b/' + file);
-      untrackedDiffs.push(diff);
+      untrackedDiffs.push(result.text());
     }
   }
 
-  return trackedDiff + untrackedDiffs.join('');
+  return unstagedDiff + stagedDiff + untrackedDiffs.join('');
 }
 
 // Configuration

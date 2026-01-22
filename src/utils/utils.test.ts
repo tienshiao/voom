@@ -266,6 +266,46 @@ index abc1234..def5678 100644`;
       const files = parseDiff(diff);
       expect(files[0].newPath).toBe("src/my file.ts");
     });
+
+    test("handles binary files with spaces in name (screenshots)", () => {
+      // Binary files don't have --- and +++ lines, only diff --git header
+      const diff = `diff --git a/Screenshot 2026-01-21 at 3.04.40 PM.png b/Screenshot 2026-01-21 at 3.04.40 PM.png
+new file mode 100644
+index 0000000..abc1234
+Binary files /dev/null and b/Screenshot 2026-01-21 at 3.04.40 PM.png differ`;
+
+      const files = parseDiff(diff);
+      expect(files.length).toBe(1);
+      expect(files[0].newPath).toBe("Screenshot 2026-01-21 at 3.04.40 PM.png");
+      expect(files[0].status).toBe("added");
+    });
+
+    test("handles quoted paths with special characters", () => {
+      const diff = `diff --git "a/path with spaces.txt" "b/path with spaces.txt"
+--- "a/path with spaces.txt"
++++ "b/path with spaces.txt"
+@@ -1 +1 @@
+-old
++new`;
+
+      const files = parseDiff(diff);
+      expect(files[0].newPath).toBe("path with spaces.txt");
+    });
+
+    test("handles quoted paths with octal-escaped UTF-8 bytes (narrow no-break space)", () => {
+      // Git escapes non-ASCII characters as octal bytes
+      // \342\200\257 = UTF-8 encoding of U+202F (narrow no-break space)
+      const diff = `diff --git "a/Screenshot 2026-01-21 at 3.04.40\\342\\200\\257PM.png" "b/Screenshot 2026-01-21 at 3.04.40\\342\\200\\257PM.png"
+new file mode 100644
+index 0000000..abc1234
+Binary files /dev/null and "b/Screenshot 2026-01-21 at 3.04.40\\342\\200\\257PM.png" differ`;
+
+      const files = parseDiff(diff);
+      expect(files.length).toBe(1);
+      // The narrow no-break space (U+202F) should be decoded
+      expect(files[0].newPath).toBe("Screenshot 2026-01-21 at 3.04.40\u202FPM.png");
+      expect(files[0].status).toBe("added");
+    });
   });
 });
 
