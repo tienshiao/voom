@@ -64,6 +64,14 @@ export function App() {
     return () => observer.disconnect();
   }, [files]);
 
+  useEffect(() => {
+    if (diffData?.directory) {
+      document.title = `Voom - ${diffData.directory}`;
+    } else {
+      document.title = "Voom";
+    }
+  }, [diffData?.directory]);
+
   const fetchDiff = async () => {
     try {
       setLoading(true);
