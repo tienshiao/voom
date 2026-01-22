@@ -1,4 +1,5 @@
 import type { LineComment } from "../types/diff";
+import "./Comment.css";
 
 interface CommentDisplayProps {
   comment: LineComment;

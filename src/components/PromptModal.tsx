@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import "./PromptModal.css";
 
 interface PromptModalProps {
   prompt: string;

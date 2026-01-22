@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import "./Comment.css";
 
 interface CommentInputProps {
   initialContent?: string;

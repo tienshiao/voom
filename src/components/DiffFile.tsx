@@ -5,6 +5,7 @@ import { CommentDisplay } from "./CommentDisplay";
 import { ImageDiff } from "./ImageDiff";
 import type { FileDiff, DiffHunk, HunkExpansionState, DiffLine, LineComment } from "../types/diff";
 import type { UseCommentsReturn } from "../hooks/useComments";
+import "./DiffFile.css";
 
 interface DiffFileProps {
   file: FileDiff;

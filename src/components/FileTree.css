@@ -1,0 +1,115 @@
+.file-tree {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.file-filter {
+  padding: 16px;
+  position: relative;
+}
+
+.filter-icon {
+  position: absolute;
+  left: 26px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #656d76;
+  pointer-events: none;
+}
+
+.filter-input {
+  width: 100%;
+  padding: 5px 12px 5px 32px;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  font-size: 14px;
+  outline: none;
+  background: #ffffff;
+}
+
+.filter-input:focus {
+  border-color: #0969da;
+  box-shadow: inset 0 0 0 1px #0969da;
+}
+
+.filter-input::placeholder {
+  color: #656d76;
+}
+
+.file-tree-list {
+  overflow-y: auto;
+  flex: 1;
+  padding-bottom: 8px;
+}
+
+.tree-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.tree-item:hover {
+  background: #f6f8fa;
+}
+
+.tree-item.selected {
+  background: #ddf4ff;
+}
+
+.tree-folder {
+  font-weight: 600;
+}
+
+.tree-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.file-icon { color: #57606a; }
+.folder-icon { color: #54aeff; }
+.file-icon-ts { color: #3178c6; }
+.file-icon-js { color: #f7df1e; }
+.file-icon-json { color: #cb8b00; }
+.file-icon-css { color: #563d7c; }
+.file-icon-md { color: #083fa1; }
+.file-icon-html { color: #e34c26; }
+.file-icon-image { color: #a855f7; }
+.file-icon-config { color: #6b7280; }
+
+.tree-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tree-stats {
+  display: flex;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-left: 8px;
+}
+
+.status-added {
+  background-color: #1a7f37;
+}
+
+.status-deleted {
+  background-color: #cf222e;
+}

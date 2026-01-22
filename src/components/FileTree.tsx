@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { FileDiff } from "../types/diff";
 import { FileIcon } from "./FileIcon";
+import "./FileTree.css";
 
 interface FileTreeProps {
   files: FileDiff[];

@@ -1,4 +1,5 @@
 import type { FileDiff } from "../types/diff";
+import "./ImageDiff.css";
 
 interface ImageDiffProps {
   file: FileDiff;
