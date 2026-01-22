@@ -11,17 +11,31 @@ export function parseDiff(diffText: string): FileDiff[] {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
 
-    // New file diff header
+    // New file diff header - extract paths from header as fallback
     if (line.startsWith("diff --git")) {
       if (currentFile) {
         if (currentHunk) {
           currentFile.hunks.push(currentHunk);
         }
+        // Set status if not already set (for empty files without ---/+++ lines)
+        if (!currentFile.status) {
+          if (currentFile.oldPath === "dev/null" || currentFile.oldPath === "/dev/null") {
+            currentFile.status = "added";
+          } else if (currentFile.newPath === "dev/null" || currentFile.newPath === "/dev/null") {
+            currentFile.status = "deleted";
+            currentFile.newPath = currentFile.oldPath;
+          } else {
+            currentFile.status = "modified";
+          }
+        }
         files.push(currentFile);
       }
+
+      // Extract paths from "diff --git a/oldPath b/newPath" as fallback
+      const match = line.match(/^diff --git a\/(.+?) b\/(.+)$/);
       currentFile = {
-        oldPath: "",
-        newPath: "",
+        oldPath: match ? match[1] : "",
+        newPath: match ? match[2] : "",
         hunks: [],
         additions: 0,
         deletions: 0,
@@ -31,6 +45,18 @@ export function parseDiff(diffText: string): FileDiff[] {
     }
 
     if (!currentFile) continue;
+
+    // Detect new file mode (for empty new files without ---/+++ lines)
+    if (line.startsWith("new file mode")) {
+      currentFile.status = "added";
+      continue;
+    }
+
+    // Detect deleted file mode (for empty deleted files without ---/+++ lines)
+    if (line.startsWith("deleted file mode")) {
+      currentFile.status = "deleted";
+      continue;
+    }
 
     // Old file path
     if (line.startsWith("--- ")) {
@@ -111,6 +137,17 @@ export function parseDiff(diffText: string): FileDiff[] {
   if (currentFile) {
     if (currentHunk) {
       currentFile.hunks.push(currentHunk);
+    }
+    // Set status if not already set (for empty files without ---/+++ lines)
+    if (!currentFile.status) {
+      if (currentFile.oldPath === "dev/null" || currentFile.oldPath === "/dev/null") {
+        currentFile.status = "added";
+      } else if (currentFile.newPath === "dev/null" || currentFile.newPath === "/dev/null") {
+        currentFile.status = "deleted";
+        currentFile.newPath = currentFile.oldPath;
+      } else {
+        currentFile.status = "modified";
+      }
     }
     files.push(currentFile);
   }
