@@ -325,7 +325,9 @@ export function DiffFile({
       {isExpanded && !file.isImage && (
         <div className="diff-content">
           {file.hunks.length === 0 ? (
-            <div className="empty-file-indicator">Empty file</div>
+            <div className="empty-file-indicator">
+              {file.isBinary ? "Binary file" : "Empty file"}
+            </div>
           ) : (
           <table className="diff-table">
             <tbody>
