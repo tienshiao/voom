@@ -141,8 +141,79 @@
 .comment-body {
   font-size: 14px;
   line-height: 1.5;
-  white-space: pre-wrap;
   word-break: break-word;
+}
+
+/* Markdown styles */
+.comment-body p {
+  margin: 0 0 0.5em;
+}
+
+.comment-body p:last-child {
+  margin-bottom: 0;
+}
+
+.comment-body code {
+  padding: 0.2em 0.4em;
+  background: #f6f8fa;
+  border-radius: 4px;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.9em;
+}
+
+.comment-body pre {
+  margin: 0.5em 0;
+  padding: 12px;
+  background: #f6f8fa;
+  border-radius: 6px;
+  overflow-x: auto;
+}
+
+.comment-body pre code {
+  padding: 0;
+  background: none;
+  font-size: 13px;
+}
+
+.comment-body h1,
+.comment-body h2,
+.comment-body h3,
+.comment-body h4,
+.comment-body h5,
+.comment-body h6 {
+  margin: 0.5em 0 0.25em;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.comment-body h1 { font-size: 1.5em; }
+.comment-body h2 { font-size: 1.25em; }
+.comment-body h3 { font-size: 1.1em; }
+
+.comment-body ul,
+.comment-body ol {
+  margin: 0.5em 0;
+  padding-left: 1.5em;
+}
+
+.comment-body li {
+  margin: 0.25em 0;
+}
+
+.comment-body blockquote {
+  margin: 0.5em 0;
+  padding: 0 1em;
+  border-left: 3px solid #d0d7de;
+  color: #656d76;
+}
+
+.comment-body a {
+  color: #0969da;
+  text-decoration: none;
+}
+
+.comment-body a:hover {
+  text-decoration: underline;
 }
 
 /* Delete confirmation */

@@ -1,3 +1,4 @@
+import ReactMarkdown from "react-markdown";
 import type { LineComment } from "../types/diff";
 import "./Comment.css";
 
@@ -53,7 +54,9 @@ export function CommentDisplay({
           </button>
         </div>
       )}
-      <div className="comment-body">{comment.content}</div>
+      <div className="comment-body">
+        <ReactMarkdown>{comment.content}</ReactMarkdown>
+      </div>
     </div>
   );
 
