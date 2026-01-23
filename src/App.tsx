@@ -20,6 +20,7 @@ export function App() {
   const [hunkExpansions, setHunkExpansions] = useState<Map<string, HunkExpansionState>>(new Map());
   const [showPromptModal, setShowPromptModal] = useState(false);
   const [claudeCodeMode, setClaudeCodeMode] = useState(false);
+  const [noFeedbackSent, setNoFeedbackSent] = useState(false);
   const commentState = useComments();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isScrollingToFile = useRef(false);
@@ -186,6 +187,21 @@ export function App() {
     const nextFile = files[currentIndex + 1];
     if (currentIndex < files.length - 1 && nextFile) {
       navigateToFile(nextFile.newPath);
+    }
+  };
+
+  const handleNoFeedback = async () => {
+    try {
+      const res = await fetch("/api/send-to-claude", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt: "No feedback" }),
+      });
+      if (res.ok) {
+        setNoFeedbackSent(true);
+      }
+    } catch (err) {
+      console.error("Failed to send to Claude:", err);
     }
   };
 
@@ -439,6 +455,14 @@ export function App() {
                 {viewedFiles.size} / {files.length} viewed
               </span>
             </div>
+            {claudeCodeMode && (
+              <button
+                className="no-feedback-btn"
+                onClick={handleNoFeedback}
+              >
+                No Feedback
+              </button>
+            )}
             <button
               className="prompt-btn"
               onClick={() => setShowPromptModal(true)}
@@ -520,6 +544,19 @@ export function App() {
           onClose={() => setShowPromptModal(false)}
           claudeCodeMode={claudeCodeMode}
         />
+      )}
+      {noFeedbackSent && (
+        <div className="prompt-modal-backdrop">
+          <div className="prompt-modal prompt-modal-sent">
+            <div className="sent-message">
+              <svg width="48" height="48" viewBox="0 0 16 16" fill="#2da44e">
+                <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z" />
+              </svg>
+              <h2>No feedback sent to Claude Code</h2>
+              <p>You can close this tab now.</p>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
