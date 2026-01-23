@@ -1,13 +1,29 @@
 import { serve, type Server } from "bun";
 import index from "./index.html";
 import { createApiRoutes } from "./api/handlers/index";
+import { resolveGitRoot, NotAGitRepoError } from "./api/utils";
 
 // Configuration
 const DEFAULT_PORT = parseInt(process.env.PORT || "3010", 10);
 const MAX_PORT_ATTEMPTS = 10;
 
-// Get target directory from CLI args or use CWD
-const targetDir = Bun.argv[2] || process.cwd();
+// Get input directory from CLI args or use CWD
+const inputDir = Bun.argv[2] || process.cwd();
+
+// Resolve to git repo root (fails fast if not a git repo)
+let targetDir: string;
+try {
+  targetDir = await resolveGitRoot(inputDir);
+  if (targetDir !== inputDir) {
+    console.log(`Resolved to git root: ${targetDir}`);
+  }
+} catch (error) {
+  if (error instanceof NotAGitRepoError) {
+    console.error(error.message);
+    process.exit(1);
+  }
+  throw error;
+}
 
 // Server configuration
 const serverConfig = {

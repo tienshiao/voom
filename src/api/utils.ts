@@ -1,3 +1,24 @@
+// Custom error for non-git directories
+export class NotAGitRepoError extends Error {
+  constructor(dir: string) {
+    super(`Not a git repository: ${dir}\n\nVoom requires a git repository to display diffs.\nPlease run voom from within a git repository or provide a path to one.`);
+    this.name = 'NotAGitRepoError';
+  }
+}
+
+// Resolve a directory to its git repository root
+export async function resolveGitRoot(targetDir: string): Promise<string> {
+  const result = await Bun.$`git -C ${targetDir} rev-parse --show-toplevel`
+    .quiet()
+    .nothrow();
+
+  if (result.exitCode !== 0) {
+    throw new NotAGitRepoError(targetDir);
+  }
+
+  return result.text().trim();
+}
+
 // Unescape git's quoted path format (handles octal-escaped UTF-8 bytes)
 export function unescapeGitPath(path: string): string {
   let result = path;
