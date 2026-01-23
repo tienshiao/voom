@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronRight, ChevronDown } from "lucide-react";
+import { ChevronRight, ChevronDown, X } from "lucide-react";
 import type { FileDiff } from "../types/diff";
 import { FileIcon } from "./FileIcon";
 import "./FileTree.css";
@@ -155,6 +155,15 @@ export function FileTree({ files, selectedFile, onSelectFile, viewedFiles }: Fil
           onChange={(e) => setFilter(e.target.value)}
           className="filter-input"
         />
+        {filter && (
+          <button
+            className="filter-clear"
+            onClick={() => setFilter("")}
+            aria-label="Clear filter"
+          >
+            <X size={14} />
+          </button>
+        )}
       </div>
       <div className="file-tree-list">{renderTree(tree)}</div>
     </div>

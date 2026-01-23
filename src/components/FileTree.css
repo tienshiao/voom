@@ -11,6 +11,18 @@
   position: relative;
 }
 
+.file-filter::after {
+  content: '';
+  position: absolute;
+  bottom: -12px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background: linear-gradient(to bottom, #ffffff, transparent);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .filter-icon {
   position: absolute;
   left: 26px;
@@ -22,7 +34,7 @@
 
 .filter-input {
   width: 100%;
-  padding: 5px 12px 5px 32px;
+  padding: 5px 32px 5px 32px;
   border: 1px solid #d0d7de;
   border-radius: 6px;
   font-size: 14px;
@@ -39,9 +51,33 @@
   color: #656d76;
 }
 
+.filter-clear {
+  position: absolute;
+  right: 22px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: 4px;
+  background: none;
+  color: #656d76;
+  cursor: pointer;
+}
+
+.filter-clear:hover {
+  background: #d0d7de;
+  color: #24292f;
+}
+
 .file-tree-list {
   overflow-y: auto;
   flex: 1;
+  padding-top: 4px;
   padding-bottom: 8px;
 }
 
