@@ -5,7 +5,7 @@ const testDir = import.meta.dir;
 const projectRoot = testDir.replace(/\/src$/, "");
 
 // Create a minimal test server with just the API routes
-let server: Server;
+let server: Server<unknown>;
 const TEST_PORT = 3099;
 
 async function getFullDiff(dir: string): Promise<string> {

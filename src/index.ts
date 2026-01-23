@@ -32,7 +32,7 @@ function isAddressInUseError(error: unknown): boolean {
 }
 
 // Try to start server, falling back to next port if current is in use
-function startServerWithPortFallback(startPort: number): Server {
+function startServerWithPortFallback(startPort: number): Server<unknown> {
   let currentPort = startPort;
 
   for (let attempt = 0; attempt < MAX_PORT_ATTEMPTS; attempt++) {

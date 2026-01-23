@@ -17,11 +17,11 @@ index abc1234..def5678 100644
 
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
-      expect(files[0].oldPath).toBe("src/index.ts");
-      expect(files[0].newPath).toBe("src/index.ts");
-      expect(files[0].status).toBe("modified");
-      expect(files[0].additions).toBe(1);
-      expect(files[0].deletions).toBe(1);
+      expect(files[0]!.oldPath).toBe("src/index.ts");
+      expect(files[0]!.newPath).toBe("src/index.ts");
+      expect(files[0]!.status).toBe("modified");
+      expect(files[0]!.additions).toBe(1);
+      expect(files[0]!.deletions).toBe(1);
     });
 
     test("parses multiple hunks in a file", () => {
@@ -41,9 +41,9 @@ index abc1234..def5678 100644
 
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
-      expect(files[0].hunks.length).toBe(2);
-      expect(files[0].additions).toBe(2);
-      expect(files[0].deletions).toBe(1);
+      expect(files[0]!.hunks.length).toBe(2);
+      expect(files[0]!.additions).toBe(2);
+      expect(files[0]!.deletions).toBe(1);
     });
   });
 
@@ -61,11 +61,11 @@ index 0000000..abc1234
 
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
-      expect(files[0].oldPath).toBe("/dev/null");
-      expect(files[0].newPath).toBe("src/new.ts");
-      expect(files[0].status).toBe("added");
-      expect(files[0].additions).toBe(3);
-      expect(files[0].deletions).toBe(0);
+      expect(files[0]!.oldPath).toBe("/dev/null");
+      expect(files[0]!.newPath).toBe("src/new.ts");
+      expect(files[0]!.status).toBe("added");
+      expect(files[0]!.additions).toBe(3);
+      expect(files[0]!.deletions).toBe(0);
     });
 
     test("parses an empty new file (no ---/+++ lines)", () => {
@@ -76,12 +76,12 @@ index 0000000..e69de29`;
 
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
-      expect(files[0].oldPath).toBe("src/empty.txt");
-      expect(files[0].newPath).toBe("src/empty.txt");
-      expect(files[0].status).toBe("added");
-      expect(files[0].hunks.length).toBe(0);
-      expect(files[0].additions).toBe(0);
-      expect(files[0].deletions).toBe(0);
+      expect(files[0]!.oldPath).toBe("src/empty.txt");
+      expect(files[0]!.newPath).toBe("src/empty.txt");
+      expect(files[0]!.status).toBe("added");
+      expect(files[0]!.hunks.length).toBe(0);
+      expect(files[0]!.additions).toBe(0);
+      expect(files[0]!.deletions).toBe(0);
     });
 
     test("parses empty new file followed by regular file", () => {
@@ -101,14 +101,14 @@ diff --git a/src/index.ts b/src/index.ts
       expect(files.length).toBe(2);
 
       // First file: empty new file
-      expect(files[0].newPath).toBe("empty.txt");
-      expect(files[0].status).toBe("added");
-      expect(files[0].hunks.length).toBe(0);
+      expect(files[0]!.newPath).toBe("empty.txt");
+      expect(files[0]!.status).toBe("added");
+      expect(files[0]!.hunks.length).toBe(0);
 
       // Second file: modified file
-      expect(files[1].newPath).toBe("src/index.ts");
-      expect(files[1].status).toBe("modified");
-      expect(files[1].hunks.length).toBe(1);
+      expect(files[1]!.newPath).toBe("src/index.ts");
+      expect(files[1]!.status).toBe("modified");
+      expect(files[1]!.hunks.length).toBe(1);
     });
 
     test("parses empty new file with dev/null in header (alternative format)", () => {
@@ -119,8 +119,8 @@ index 0000000..e69de29`;
 
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
-      expect(files[0].newPath).toBe("src/empty.txt");
-      expect(files[0].status).toBe("added");
+      expect(files[0]!.newPath).toBe("src/empty.txt");
+      expect(files[0]!.status).toBe("added");
     });
   });
 
@@ -138,11 +138,11 @@ index abc1234..0000000
 
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
-      expect(files[0].oldPath).toBe("src/old.ts");
-      expect(files[0].newPath).toBe("src/old.ts"); // newPath is set to oldPath for deleted files
-      expect(files[0].status).toBe("deleted");
-      expect(files[0].additions).toBe(0);
-      expect(files[0].deletions).toBe(3);
+      expect(files[0]!.oldPath).toBe("src/old.ts");
+      expect(files[0]!.newPath).toBe("src/old.ts"); // newPath is set to oldPath for deleted files
+      expect(files[0]!.status).toBe("deleted");
+      expect(files[0]!.additions).toBe(0);
+      expect(files[0]!.deletions).toBe(3);
     });
 
     test("parses an empty deleted file (no ---/+++ lines)", () => {
@@ -152,9 +152,9 @@ index e69de29..0000000`;
 
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
-      expect(files[0].newPath).toBe("empty.txt");
-      expect(files[0].status).toBe("deleted");
-      expect(files[0].hunks.length).toBe(0);
+      expect(files[0]!.newPath).toBe("empty.txt");
+      expect(files[0]!.status).toBe("deleted");
+      expect(files[0]!.hunks.length).toBe(0);
     });
   });
 
@@ -181,9 +181,9 @@ diff --git a/src/c.ts b/src/c.ts
 
       const files = parseDiff(diff);
       expect(files.length).toBe(3);
-      expect(files[0].newPath).toBe("src/a.ts");
-      expect(files[1].newPath).toBe("src/b.ts");
-      expect(files[2].newPath).toBe("src/c.ts");
+      expect(files[0]!.newPath).toBe("src/a.ts");
+      expect(files[1]!.newPath).toBe("src/b.ts");
+      expect(files[2]!.newPath).toBe("src/c.ts");
     });
   });
 
@@ -199,14 +199,14 @@ diff --git a/src/c.ts b/src/c.ts
  context line`;
 
       const files = parseDiff(diff);
-      const hunk = files[0].hunks[0];
+      const hunk = files[0]!.hunks[0]!;
       expect(hunk.oldStart).toBe(10);
       expect(hunk.oldCount).toBe(7);
       expect(hunk.newStart).toBe(10);
       expect(hunk.newCount).toBe(7);
       // First line is hunk-header with function context
-      expect(hunk.lines[0].type).toBe("hunk-header");
-      expect(hunk.lines[0].content).toBe(" function example() {");
+      expect(hunk.lines[0]!.type).toBe("hunk-header");
+      expect(hunk.lines[0]!.content).toBe(" function example() {");
     });
 
     test("parses line numbers correctly", () => {
@@ -220,22 +220,22 @@ diff --git a/src/c.ts b/src/c.ts
  line 7`;
 
       const files = parseDiff(diff);
-      const lines = files[0].hunks[0].lines;
+      const lines = files[0]!.hunks[0]!.lines;
 
       // Skip hunk-header
-      expect(lines[1].type).toBe("context");
-      expect(lines[1].oldLineNum).toBe(5);
-      expect(lines[1].newLineNum).toBe(5);
+      expect(lines[1]!.type).toBe("context");
+      expect(lines[1]!.oldLineNum).toBe(5);
+      expect(lines[1]!.newLineNum).toBe(5);
 
-      expect(lines[2].type).toBe("deletion");
-      expect(lines[2].oldLineNum).toBe(6);
+      expect(lines[2]!.type).toBe("deletion");
+      expect(lines[2]!.oldLineNum).toBe(6);
 
-      expect(lines[3].type).toBe("addition");
-      expect(lines[3].newLineNum).toBe(6);
+      expect(lines[3]!.type).toBe("addition");
+      expect(lines[3]!.newLineNum).toBe(6);
 
-      expect(lines[4].type).toBe("context");
-      expect(lines[4].oldLineNum).toBe(7);
-      expect(lines[4].newLineNum).toBe(7);
+      expect(lines[4]!.type).toBe("context");
+      expect(lines[4]!.oldLineNum).toBe(7);
+      expect(lines[4]!.newLineNum).toBe(7);
     });
   });
 
@@ -251,8 +251,8 @@ index abc1234..def5678 100644`;
 
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
-      expect(files[0].newPath).toBe("src/index.ts");
-      expect(files[0].hunks.length).toBe(0);
+      expect(files[0]!.newPath).toBe("src/index.ts");
+      expect(files[0]!.hunks.length).toBe(0);
     });
 
     test("handles file paths with spaces", () => {
@@ -264,7 +264,7 @@ index abc1234..def5678 100644`;
 +new`;
 
       const files = parseDiff(diff);
-      expect(files[0].newPath).toBe("src/my file.ts");
+      expect(files[0]!.newPath).toBe("src/my file.ts");
     });
 
     test("handles binary files with spaces in name (screenshots)", () => {
@@ -276,8 +276,8 @@ Binary files /dev/null and b/Screenshot 2026-01-21 at 3.04.40 PM.png differ`;
 
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
-      expect(files[0].newPath).toBe("Screenshot 2026-01-21 at 3.04.40 PM.png");
-      expect(files[0].status).toBe("added");
+      expect(files[0]!.newPath).toBe("Screenshot 2026-01-21 at 3.04.40 PM.png");
+      expect(files[0]!.status).toBe("added");
     });
 
     test("handles quoted paths with special characters", () => {
@@ -289,7 +289,7 @@ Binary files /dev/null and b/Screenshot 2026-01-21 at 3.04.40 PM.png differ`;
 +new`;
 
       const files = parseDiff(diff);
-      expect(files[0].newPath).toBe("path with spaces.txt");
+      expect(files[0]!.newPath).toBe("path with spaces.txt");
     });
 
     test("handles quoted paths with octal-escaped UTF-8 bytes (narrow no-break space)", () => {
@@ -303,8 +303,8 @@ Binary files /dev/null and "b/Screenshot 2026-01-21 at 3.04.40\\342\\200\\257PM.
       const files = parseDiff(diff);
       expect(files.length).toBe(1);
       // The narrow no-break space (U+202F) should be decoded
-      expect(files[0].newPath).toBe("Screenshot 2026-01-21 at 3.04.40\u202FPM.png");
-      expect(files[0].status).toBe("added");
+      expect(files[0]!.newPath).toBe("Screenshot 2026-01-21 at 3.04.40\u202FPM.png");
+      expect(files[0]!.status).toBe("added");
     });
   });
 });
@@ -385,12 +385,12 @@ describe("enhanceWithWordDiff", () => {
     const files = parseDiff(diff);
     const enhanced = enhanceWithWordDiff(files);
 
-    const hunk = enhanced[0].hunks[0];
+    const hunk = enhanced[0]!.hunks[0]!;
     const deletionLine = hunk.lines.find(l => l.type === "deletion");
     const additionLine = hunk.lines.find(l => l.type === "addition");
 
-    expect(deletionLine?.segments).toBeDefined();
-    expect(additionLine?.segments).toBeDefined();
+    expect(deletionLine!.segments).toBeDefined();
+    expect(additionLine!.segments).toBeDefined();
   });
 
   test("does not add segments to unpaired lines", () => {
@@ -406,16 +406,16 @@ describe("enhanceWithWordDiff", () => {
     const files = parseDiff(diff);
     const enhanced = enhanceWithWordDiff(files);
 
-    const hunk = enhanced[0].hunks[0];
+    const hunk = enhanced[0]!.hunks[0]!;
     const deletionLine = hunk.lines.find(l => l.type === "deletion");
     const additionLines = hunk.lines.filter(l => l.type === "addition");
 
     // First deletion/addition pair should have segments
-    expect(deletionLine?.segments).toBeDefined();
-    expect(additionLines[0]?.segments).toBeDefined();
+    expect(deletionLine!.segments).toBeDefined();
+    expect(additionLines[0]!.segments).toBeDefined();
 
     // Second addition (unpaired) should not have segments
-    expect(additionLines[1]?.segments).toBeUndefined();
+    expect(additionLines[1]!.segments).toBeUndefined();
   });
 
   test("handles multiple deletion/addition pairs", () => {
@@ -431,14 +431,14 @@ describe("enhanceWithWordDiff", () => {
     const files = parseDiff(diff);
     const enhanced = enhanceWithWordDiff(files);
 
-    const hunk = enhanced[0].hunks[0];
+    const hunk = enhanced[0]!.hunks[0]!;
     const deletions = hunk.lines.filter(l => l.type === "deletion");
     const additions = hunk.lines.filter(l => l.type === "addition");
 
     // Both pairs should have segments
-    expect(deletions[0]?.segments).toBeDefined();
-    expect(deletions[1]?.segments).toBeDefined();
-    expect(additions[0]?.segments).toBeDefined();
-    expect(additions[1]?.segments).toBeDefined();
+    expect(deletions[0]!.segments).toBeDefined();
+    expect(deletions[1]!.segments).toBeDefined();
+    expect(additions[0]!.segments).toBeDefined();
+    expect(additions[1]!.segments).toBeDefined();
   });
 });

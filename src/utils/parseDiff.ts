@@ -12,7 +12,7 @@ function unescapeGitPath(path: string): string {
     const octalPattern = /\\([0-7]{3})/g;
     let octalMatch;
     while ((octalMatch = octalPattern.exec(match)) !== null) {
-      bytes.push(parseInt(octalMatch[1], 8));
+      bytes.push(parseInt(octalMatch[1]!, 8));
     }
     return new TextDecoder().decode(new Uint8Array(bytes));
   });
@@ -34,8 +34,8 @@ function parseGitDiffHeader(line: string): { oldPath: string; newPath: string } 
   const quotedMatch = afterPrefix.match(/^"a\/(.+)" "b\/(.+)"$/);
   if (quotedMatch) {
     return {
-      oldPath: unescapeGitPath(quotedMatch[1]),
-      newPath: unescapeGitPath(quotedMatch[2]),
+      oldPath: unescapeGitPath(quotedMatch[1]!),
+      newPath: unescapeGitPath(quotedMatch[2]!),
     };
   }
 
@@ -100,6 +100,7 @@ export function parseDiff(diffText: string): FileDiff[] {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
+    if (line === undefined) continue;
 
     // New file diff header - extract paths from header as fallback
     if (line.startsWith("diff --git")) {
@@ -190,8 +191,8 @@ export function parseDiff(diffText: string): FileDiff[] {
       if (currentHunk) {
         currentFile.hunks.push(currentHunk);
       }
-      oldLineNum = parseInt(hunkMatch[1], 10);
-      newLineNum = parseInt(hunkMatch[3], 10);
+      oldLineNum = parseInt(hunkMatch[1]!, 10);
+      newLineNum = parseInt(hunkMatch[3]!, 10);
       currentHunk = {
         header: line,
         oldStart: oldLineNum,

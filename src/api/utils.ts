@@ -11,7 +11,7 @@ export function unescapeGitPath(path: string): string {
     const octalPattern = /\\([0-7]{3})/g;
     let octalMatch;
     while ((octalMatch = octalPattern.exec(match)) !== null) {
-      bytes.push(parseInt(octalMatch[1], 8));
+      bytes.push(parseInt(octalMatch[1]!, 8));
     }
     return new TextDecoder().decode(new Uint8Array(bytes));
   });

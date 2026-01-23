@@ -45,8 +45,8 @@ export function App() {
           .filter((entry) => entry.isIntersecting)
           .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
 
-        if (visibleEntries.length > 0) {
-          const topEntry = visibleEntries[0];
+        const topEntry = visibleEntries[0];
+        if (topEntry) {
           const path = topEntry.target.getAttribute("data-file-path");
           if (path) {
             setSelectedFile(path);
@@ -102,10 +102,10 @@ export function App() {
       const totalLines = enhanced.reduce((sum, f) => sum + f.additions + f.deletions, 0);
       const shouldAutoEnable = enhanced.length >= FILE_COUNT_THRESHOLD || totalLines >= TOTAL_LINES_THRESHOLD;
 
-      if (shouldAutoEnable) {
+      if (shouldAutoEnable && enhanced[0]) {
         setViewMode('single');
-        setSelectedFile(enhanced[0]?.newPath ?? null);
-        setExpandedFiles(new Set([enhanced[0]?.newPath]));
+        setSelectedFile(enhanced[0].newPath);
+        setExpandedFiles(new Set([enhanced[0].newPath]));
       } else {
         setExpandedFiles(new Set(parsed.map((f) => f.newPath)));
       }
@@ -169,16 +169,18 @@ export function App() {
   const navigateToPrevFile = () => {
     if (!selectedFile) return;
     const currentIndex = files.findIndex((f) => f.newPath === selectedFile);
-    if (currentIndex > 0) {
-      navigateToFile(files[currentIndex - 1].newPath);
+    const prevFile = files[currentIndex - 1];
+    if (currentIndex > 0 && prevFile) {
+      navigateToFile(prevFile.newPath);
     }
   };
 
   const navigateToNextFile = () => {
     if (!selectedFile) return;
     const currentIndex = files.findIndex((f) => f.newPath === selectedFile);
-    if (currentIndex < files.length - 1) {
-      navigateToFile(files[currentIndex + 1].newPath);
+    const nextFile = files[currentIndex + 1];
+    if (currentIndex < files.length - 1 && nextFile) {
+      navigateToFile(nextFile.newPath);
     }
   };
 

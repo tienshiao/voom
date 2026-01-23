@@ -72,7 +72,7 @@ export function createGitImageHandler(targetDir: string) {
 
         const mimeType = getImageMimeType(filePath);
 
-        return new Response(result.stdout, {
+        return new Response(new Uint8Array(result.stdout), {
           headers: {
             "Content-Type": mimeType,
             "Cache-Control": "no-cache",

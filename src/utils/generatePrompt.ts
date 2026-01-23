@@ -19,6 +19,7 @@ function getLineContent(
   // Search through hunks
   for (let hunkIndex = 0; hunkIndex < file.hunks.length; hunkIndex++) {
     const hunk = file.hunks[hunkIndex];
+    if (!hunk) continue;
     const expansionKey = `${filePath}:${hunkIndex}`;
     const expansion = hunkExpansions.get(expansionKey);
 
@@ -64,7 +65,7 @@ function matchesLine(line: DiffLine, lineNumber: number, lineType: string): bool
 function getFileExtension(filePath: string): string {
   const parts = filePath.split(".");
   if (parts.length > 1) {
-    return parts[parts.length - 1];
+    return parts[parts.length - 1] ?? "";
   }
   return "";
 }
