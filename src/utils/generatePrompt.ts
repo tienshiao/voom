@@ -101,8 +101,10 @@ export function generatePrompt({ comments, files, hunkExpansions }: GenerateProm
 
     // File-level comments first
     for (const comment of fileLevelComments) {
+      lines.push("```");
       lines.push(`File: ${filePath}`);
       lines.push(`Review comment: ${comment.content}`);
+      lines.push("```")
       lines.push("");
     }
 
@@ -123,6 +125,7 @@ export function generatePrompt({ comments, files, hunkExpansions }: GenerateProm
         hunkExpansions
       );
 
+      lines.push("```");
       lines.push(`File: ${filePath}`);
       lines.push(`Line number: ${comment.lineNumber}`);
       lines.push(`Line type: ${lineTypeLabel}`);
@@ -130,6 +133,7 @@ export function generatePrompt({ comments, files, hunkExpansions }: GenerateProm
         lines.push(`Line content: ${lineContent}`);
       }
       lines.push(`Review comment: ${comment.content}`);
+      lines.push("```");
       lines.push("");
     }
   }

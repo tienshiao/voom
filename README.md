@@ -100,6 +100,38 @@ bun start /path/to/repo
 
 The browser opens automatically. Add comments by clicking the + button on any diff line, then click "Prompt" to generate a formatted prompt for your AI assistant.
 
+### With Claude Code
+
+Voom integrates with [Claude Code](https://docs.anthropic.com/en/docs/claude-code) to enable visual code review during an agentic session. Set up a skill to run Voom, review the changes and add comments in your browser, then send the feedback directly back to Claude Code.
+
+#### Setup
+
+Create a skill file at `~/.claude/commands/voom.md`:
+
+```markdown
+Please run the `voom` command to collect code review feedback.
+Review the feedback and make necessary changes to the code to address the feedback.
+```
+
+#### Usage
+
+Invoke the skill in Claude Code:
+
+```
+/voom
+```
+
+This opens the diff viewer. After reviewing:
+1. Add comments on lines that need attention
+2. Click "Prompt" to open the prompt modal
+3. Click "Send to Claude Code" to send feedback and exit
+
+When you click "Send to Claude Code", the prompt is printed to stdout and Voom exits, returning control to Claude Code with your feedback. Claude Code will then address the review comments.
+
+Claude Code automatically sets the `CLAUDECODE` environment variable, which enables Claude Code mode:
+- Suppresses startup output (so only your feedback is returned)
+- Shows the "Send to Claude Code" button in the prompt modal
+
 ## Development
 
 ```bash

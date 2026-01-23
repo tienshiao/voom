@@ -6,6 +6,7 @@ import { resolveGitRoot, NotAGitRepoError } from "./api/utils";
 // Configuration
 const DEFAULT_PORT = parseInt(process.env.PORT || "3010", 10);
 const MAX_PORT_ATTEMPTS = 10;
+const CLAUDE_CODE_MODE = !!process.env.CLAUDECODE;
 
 // Get input directory from CLI args or use CWD
 const inputDir = Bun.argv[2] || process.cwd();
@@ -14,7 +15,7 @@ const inputDir = Bun.argv[2] || process.cwd();
 let targetDir: string;
 try {
   targetDir = await resolveGitRoot(inputDir);
-  if (targetDir !== inputDir) {
+  if (targetDir !== inputDir && !CLAUDE_CODE_MODE) {
     console.log(`Resolved to git root: ${targetDir}`);
   }
 } catch (error) {
@@ -56,7 +57,9 @@ function startServerWithPortFallback(startPort: number): Server<unknown> {
       return serve({ ...serverConfig, port: currentPort });
     } catch (error) {
       if (isAddressInUseError(error)) {
-        console.warn(`Port ${currentPort} is in use, trying ${currentPort + 1}...`);
+        if (!CLAUDE_CODE_MODE) {
+          console.warn(`Port ${currentPort} is in use, trying ${currentPort + 1}...`);
+        }
         currentPort++;
       } else {
         throw error;
@@ -71,10 +74,12 @@ function startServerWithPortFallback(startPort: number): Server<unknown> {
 
 const server = startServerWithPortFallback(DEFAULT_PORT);
 
-if (server.port !== DEFAULT_PORT) {
-  console.log(`Note: Default port ${DEFAULT_PORT} was in use`);
+if (!CLAUDE_CODE_MODE) {
+  if (server.port !== DEFAULT_PORT) {
+    console.log(`Note: Default port ${DEFAULT_PORT} was in use`);
+  }
+  console.log(`Voom running at ${server.url}`);
 }
-console.log(`Server running at ${server.url}`);
 
 // Open the browser automatically (cross-platform)
 const url = server.url.href;

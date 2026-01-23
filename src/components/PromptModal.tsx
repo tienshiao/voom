@@ -4,10 +4,13 @@ import "./PromptModal.css";
 interface PromptModalProps {
   prompt: string;
   onClose: () => void;
+  claudeCodeMode?: boolean;
 }
 
-export function PromptModal({ prompt, onClose }: PromptModalProps) {
+export function PromptModal({ prompt, onClose, claudeCodeMode }: PromptModalProps) {
   const [copied, setCopied] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const handleCopy = useCallback(async () => {
     try {
@@ -16,6 +19,24 @@ export function PromptModal({ prompt, onClose }: PromptModalProps) {
       setTimeout(() => setCopied(false), 2000);
     } catch (err) {
       console.error("Failed to copy:", err);
+    }
+  }, [prompt]);
+
+  const handleSendToClaude = useCallback(async () => {
+    setSending(true);
+    try {
+      const res = await fetch("/api/send-to-claude", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt }),
+      });
+      if (res.ok) {
+        setSent(true);
+      }
+    } catch (err) {
+      console.error("Failed to send to Claude:", err);
+    } finally {
+      setSending(false);
     }
   }, [prompt]);
 
@@ -42,6 +63,22 @@ export function PromptModal({ prompt, onClose }: PromptModalProps) {
     return () => document.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
+  if (sent) {
+    return (
+      <div className="prompt-modal-backdrop">
+        <div className="prompt-modal prompt-modal-sent">
+          <div className="sent-message">
+            <svg width="48" height="48" viewBox="0 0 16 16" fill="#2da44e">
+              <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z" />
+            </svg>
+            <h2>Prompt sent to Claude Code</h2>
+            <p>You can close this tab now.</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="prompt-modal-backdrop" onClick={handleBackdropClick}>
       <div className="prompt-modal">
@@ -57,9 +94,20 @@ export function PromptModal({ prompt, onClose }: PromptModalProps) {
           <pre className="prompt-text">{prompt}</pre>
         </div>
         <div className="prompt-modal-footer">
-          <button className="btn-copy" onClick={handleCopy}>
-            {copied ? "Copied!" : "Copy to Clipboard"}
-          </button>
+          {claudeCodeMode ? (
+            <>
+              <button className="btn-secondary" onClick={handleCopy}>
+                {copied ? "Copied!" : "Copy to Clipboard"}
+              </button>
+              <button className="btn-primary" onClick={handleSendToClaude} disabled={sending}>
+                {sending ? "Sending..." : "Send to Claude Code"}
+              </button>
+            </>
+          ) : (
+            <button className="btn-primary" onClick={handleCopy}>
+              {copied ? "Copied!" : "Copy to Clipboard"}
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -19,6 +19,7 @@ export function App() {
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [hunkExpansions, setHunkExpansions] = useState<Map<string, HunkExpansionState>>(new Map());
   const [showPromptModal, setShowPromptModal] = useState(false);
+  const [claudeCodeMode, setClaudeCodeMode] = useState(false);
   const commentState = useComments();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isScrollingToFile = useRef(false);
@@ -30,6 +31,10 @@ export function App() {
 
   useEffect(() => {
     fetchDiff();
+    fetch("/api/config")
+      .then((res) => res.json())
+      .then((data) => setClaudeCodeMode(data.claudeCodeMode))
+      .catch(console.error);
   }, []);
 
   useEffect(() => {
@@ -513,6 +518,7 @@ export function App() {
         <PromptModal
           prompt={generatePrompt({ comments: commentState.comments, files, hunkExpansions })}
           onClose={() => setShowPromptModal(false)}
+          claudeCodeMode={claudeCodeMode}
         />
       )}
     </div>
