@@ -25,7 +25,9 @@ body {
   min-width: 300px;
   background: #ffffff;
   border-right: 1px solid #d0d7de;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   position: sticky;
   top: 0;
   height: 100vh;
