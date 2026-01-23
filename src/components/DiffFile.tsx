@@ -324,6 +324,9 @@ export function DiffFile({
       )}
       {isExpanded && !file.isImage && (
         <div className="diff-content">
+          {file.hunks.length === 0 ? (
+            <div className="empty-file-indicator">Empty file</div>
+          ) : (
           <table className="diff-table">
             <tbody>
               {file.hunks.map((hunk, hunkIdx) => {
@@ -521,6 +524,7 @@ export function DiffFile({
               })}
             </tbody>
           </table>
+          )}
         </div>
       )}
     </div>

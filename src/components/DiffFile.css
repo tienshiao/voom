@@ -375,3 +375,12 @@
   border-color: #2da44e;
   color: #1a7f37;
 }
+
+/* Empty file indicator */
+.empty-file-indicator {
+  padding: 16px;
+  text-align: center;
+  color: #656d76;
+  font-style: italic;
+  font-size: 13px;
+}
