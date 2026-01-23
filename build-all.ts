@@ -29,9 +29,10 @@ for (const platform of platforms) {
       entrypoints: [entrypoint],
       compile: {
         target: platform.target as any,
-	outfile: platform.outfile
+        outfile: platform.outfile,
       },
       minify: true,
+      bytecode: true,
       outdir,
     });
     console.log(`✅ Successfully built for ${platform.target}`);
