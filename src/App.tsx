@@ -55,7 +55,7 @@ export function App() {
       },
       {
         root: scrollContainerRef.current,
-        rootMargin: "-57px 0px 0px 0px",
+        rootMargin: "-80px 0px 0px 0px",
         threshold: 0,
       }
     );
@@ -392,59 +392,56 @@ export function App() {
   return (
     <div className="diff-viewer">
       <div className="diff-sidebar">
-        <div className="sidebar-header">
-          <span className="files-count">
-            {files.length} file{files.length !== 1 ? "s" : ""} changed
-          </span>
-          <span className="total-stats">
-            <span className="stat-add">+{totalAdditions}</span>
-            <span className="stat-del">-{totalDeletions}</span>
-          </span>
-        </div>
         <FileTree
           files={files}
           selectedFile={selectedFile}
           onSelectFile={navigateToFile}
           viewedFiles={viewedFiles}
+          totalAdditions={totalAdditions}
+          totalDeletions={totalDeletions}
         />
       </div>
       <div className="diff-main" ref={scrollContainerRef}>
         <div className="diff-header">
-          <h1>Code Review</h1>
-          {diffData?.directory && (
-            <span className="directory-badge">{diffData.directory}</span>
-          )}
-          <div className="view-mode-toggle">
+          <div className="diff-header-row">
+            <h1>Code Review</h1>
+            {diffData?.directory && (
+              <span className="directory-badge">{diffData.directory}</span>
+            )}
+          </div>
+          <div className="diff-header-row">
+            <div className="view-mode-toggle">
+              <button
+                className={`mode-btn ${viewMode === 'all' ? 'mode-btn-active' : ''}`}
+                onClick={() => setViewMode('all')}
+              >
+                All Files
+              </button>
+              <button
+                className={`mode-btn ${viewMode === 'single' ? 'mode-btn-active' : ''}`}
+                onClick={() => setViewMode('single')}
+              >
+                Single File
+              </button>
+            </div>
+            <div className="viewed-progress">
+              <progress
+                className="viewed-progress-bar"
+                value={viewedFiles.size}
+                max={files.length}
+              />
+              <span className="viewed-progress-text">
+                {viewedFiles.size} / {files.length} viewed
+              </span>
+            </div>
             <button
-              className={`mode-btn ${viewMode === 'all' ? 'mode-btn-active' : ''}`}
-              onClick={() => setViewMode('all')}
+              className="prompt-btn"
+              onClick={() => setShowPromptModal(true)}
+              disabled={commentState.comments.size === 0}
             >
-              All Files
-            </button>
-            <button
-              className={`mode-btn ${viewMode === 'single' ? 'mode-btn-active' : ''}`}
-              onClick={() => setViewMode('single')}
-            >
-              Single File
+              Prompt
             </button>
           </div>
-          <div className="viewed-progress">
-            <progress
-              className="viewed-progress-bar"
-              value={viewedFiles.size}
-              max={files.length}
-            />
-            <span className="viewed-progress-text">
-              {viewedFiles.size} / {files.length} viewed
-            </span>
-          </div>
-          <button
-            className="prompt-btn"
-            onClick={() => setShowPromptModal(true)}
-            disabled={commentState.comments.size === 0}
-          >
-            Prompt
-          </button>
         </div>
         <div className={`diff-files ${viewMode === 'single' ? 'diff-files-single' : ''}`}>
           {viewMode === 'all' ? (

@@ -9,9 +9,11 @@ interface FileTreeProps {
   selectedFile: string | null;
   onSelectFile: (path: string) => void;
   viewedFiles?: Set<string>;
+  totalAdditions: number;
+  totalDeletions: number;
 }
 
-export function FileTree({ files, selectedFile, onSelectFile, viewedFiles }: FileTreeProps) {
+export function FileTree({ files, selectedFile, onSelectFile, viewedFiles, totalAdditions, totalDeletions }: FileTreeProps) {
   const [filter, setFilter] = useState("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -144,26 +146,37 @@ export function FileTree({ files, selectedFile, onSelectFile, viewedFiles }: Fil
 
   return (
     <div className="file-tree">
-      <div className="file-filter">
-        <svg className="filter-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
-          <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.499 4.499 0 1 0-8.997 0A4.499 4.499 0 0 0 11.5 7Z" />
-        </svg>
-        <input
-          type="text"
-          placeholder="Filter changed files"
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          className="filter-input"
-        />
-        {filter && (
-          <button
-            className="filter-clear"
-            onClick={() => setFilter("")}
-            aria-label="Clear filter"
-          >
-            <X size={14} />
-          </button>
-        )}
+      <div className="sidebar-header">
+        <div className="sidebar-header-row">
+          <span className="files-count">
+            {files.length} file{files.length !== 1 ? "s" : ""} changed
+          </span>
+          <span className="total-stats">
+            <span className="stat-add">+{totalAdditions}</span>
+            <span className="stat-del">-{totalDeletions}</span>
+          </span>
+        </div>
+        <div className="sidebar-header-row file-filter">
+          <svg className="filter-icon" width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M10.68 11.74a6 6 0 0 1-7.922-8.982 6 6 0 0 1 8.982 7.922l3.04 3.04a.749.749 0 0 1-.326 1.275.749.749 0 0 1-.734-.215ZM11.5 7a4.499 4.499 0 1 0-8.997 0A4.499 4.499 0 0 0 11.5 7Z" />
+          </svg>
+          <input
+            type="text"
+            placeholder="Filter changed files"
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="filter-input"
+          />
+          {filter && (
+            <button
+              className="filter-clear"
+              onClick={() => setFilter("")}
+              aria-label="Clear filter"
+            >
+              <X size={14} />
+            </button>
+          )}
+        </div>
       </div>
       <div className="file-tree-list">{renderTree(tree)}</div>
     </div>
