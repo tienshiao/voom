@@ -136,6 +136,7 @@
 .line-content {
   padding: 0 8px;
   white-space: pre;
+  position: relative;
 }
 
 .hunk-content {
@@ -229,7 +230,7 @@
 .add-comment-btn {
   display: none;
   position: absolute;
-  left: 4px;
+  left: -10px;
   top: 50%;
   transform: translateY(-50%);
   width: 20px;

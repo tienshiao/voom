@@ -89,6 +89,10 @@ function ContextLine({
     <>
       <tr className="diff-line diff-line-context expanded-context">
         <td className="line-num line-num-old">
+          {line.oldLineNum ?? ""}
+        </td>
+        <td className="line-num line-num-new">{line.newLineNum ?? ""}</td>
+        <td className="line-content">
           <button
             className="add-comment-btn"
             onClick={(e) => {
@@ -99,10 +103,6 @@ function ContextLine({
           >
             <Plus size={14} />
           </button>
-          {line.oldLineNum ?? ""}
-        </td>
-        <td className="line-num line-num-new">{line.newLineNum ?? ""}</td>
-        <td className="line-content">
           <span className="line-prefix"> </span>
           <span className="line-text">{line.content}</span>
         </td>
@@ -410,6 +410,12 @@ export function DiffFile({
                         <React.Fragment key={`${hunkIdx}-${lineIdx}`}>
                           <tr className={`diff-line diff-line-${line.type}`}>
                             <td className="line-num line-num-old">
+                              {line.oldLineNum ?? ""}
+                            </td>
+                            <td className="line-num line-num-new">
+                              {line.newLineNum ?? ""}
+                            </td>
+                            <td className="line-content">
                               {lineNum && (
                                 <button
                                   className="add-comment-btn"
@@ -422,12 +428,6 @@ export function DiffFile({
                                   <Plus size={14} />
                                 </button>
                               )}
-                              {line.oldLineNum ?? ""}
-                            </td>
-                            <td className="line-num line-num-new">
-                              {line.newLineNum ?? ""}
-                            </td>
-                            <td className="line-content">
                               <span className="line-prefix">
                                 {line.type === "addition"
                                   ? "+"
