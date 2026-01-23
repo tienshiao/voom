@@ -8,7 +8,7 @@ put me in a code review mindset without needing me to commit and push first.
 ![Generating prompts](./images/prompt.png)
 
 ## About the name
-I was reading The Cat in the Hat Comes Back to my son one night after working on this project. In the book, Voom
+I was reading *The Cat in the Hat Comes Back* to my son one night after working on this project. In the book, Voom
 is a deus ex machina that is used to clean up pink spots. Which seems apt for a tool that helps clean up code generated
 by Claude (my AI of choice).
 
@@ -24,7 +24,71 @@ by Claude (my AI of choice).
 - Generate markdown prompts from comments for AI coding assistants
 - Single-file mode for large diffs (auto-enabled for 30+ files or 1500+ changed lines, with keyboard navigation via ←/→)
 
+## Requirements
+
+Building Voom requires [Bun](https://bun.sh), a fast JavaScript runtime. Install it with:
+
+```bash
+# macOS/Linux
+curl -fsSL https://bun.sh/install | bash
+
+# Windows (PowerShell)
+powershell -c "irm bun.sh/install.ps1 | iex"
+
+# Or via Homebrew
+brew install oven-sh/bun/bun
+```
+
+Once installed, the standalone binary has no runtime dependencies.
+
+## Installation
+
+### Standalone Binary (Recommended)
+
+Build a standalone executable that requires no dependencies:
+
+```bash
+bun install
+bun run build:voom        # Build for current platform
+```
+
+Then move the binary to your PATH:
+
+```bash
+# macOS/Linux
+mv voom /usr/local/bin/
+
+# Or add to a custom bin directory
+mv voom ~/bin/
+```
+
+### Cross-Platform Builds
+
+Build for all platforms at once:
+
+```bash
+bun run build:voom:all
+```
+
+This creates binaries in `dist-executables/`:
+- `voom-macos-arm64` - macOS Apple Silicon
+- `voom-macos-x64` - macOS Intel
+- `voom-linux-x64` - Linux x64
+- `voom-windows-x64.exe` - Windows x64
+
 ## Usage
+
+### With Standalone Binary
+
+```bash
+# Review changes in current directory
+voom
+
+# Review changes in a specific directory
+voom /path/to/repo
+```
+
+### With Bun (Development)
 
 ```bash
 # Review changes in current directory
