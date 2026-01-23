@@ -405,6 +405,7 @@ export function App() {
           files={files}
           selectedFile={selectedFile}
           onSelectFile={navigateToFile}
+          viewedFiles={viewedFiles}
         />
       </div>
       <div className="diff-main" ref={scrollContainerRef}>

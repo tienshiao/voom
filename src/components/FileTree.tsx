@@ -8,9 +8,10 @@ interface FileTreeProps {
   files: FileDiff[];
   selectedFile: string | null;
   onSelectFile: (path: string) => void;
+  viewedFiles?: Set<string>;
 }
 
-export function FileTree({ files, selectedFile, onSelectFile }: FileTreeProps) {
+export function FileTree({ files, selectedFile, onSelectFile, viewedFiles }: FileTreeProps) {
   const [filter, setFilter] = useState("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -102,13 +103,14 @@ export function FileTree({ files, selectedFile, onSelectFile }: FileTreeProps) {
       const isFile = value.__file;
       const file = value.__file as FileDiff | undefined;
       const isExpanded = expandedPaths.has(fullPath);
+      const isViewed = isFile && file && viewedFiles?.has(file.newPath);
 
       return (
         <div key={fullPath}>
           <div
             className={`tree-item ${isFile ? "tree-file" : "tree-folder"} ${
               selectedFile === file?.newPath ? "selected" : ""
-            }`}
+            } ${isViewed ? "tree-item-viewed" : ""}`}
             style={{ paddingLeft: `${depth * 16 + 8}px` }}
             onClick={() => isFile ? onSelectFile(file!.newPath) : toggleDirectory(fullPath)}
           >

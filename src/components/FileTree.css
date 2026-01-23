@@ -130,3 +130,7 @@
 .status-deleted {
   background-color: #cf222e;
 }
+
+.tree-item-viewed {
+  opacity: 0.5;
+}
