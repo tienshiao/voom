@@ -239,8 +239,9 @@ export function DiffFile({
   };
 
   return (
-    <div className="diff-file">
+    <div className={`diff-file ${!isExpanded ? 'diff-file-collapsed' : ''}`}>
       <div className="diff-file-header" onClick={onToggle}>
+        <span className="header-gap-cover" />
         <span className="expand-icon">
           {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         </span>

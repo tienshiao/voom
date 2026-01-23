@@ -66,8 +66,9 @@ body {
 .diff-main {
   flex: 1;
   overflow: auto;
-  height: 100vh;
-  padding: 96px 24px 16px;
+  height: calc(100vh - 80px);
+  margin-top: 80px;
+  padding: 16px 24px;
 }
 
 .diff-header {
@@ -85,6 +86,7 @@ body {
   z-index: 20;
   height: 80px;
 }
+
 
 .diff-header-row {
   display: flex;
@@ -338,6 +340,8 @@ body {
   }
 
   .diff-main {
-    padding: 96px 16px 16px;
+    height: calc(100vh - 80px);
+    margin-top: 80px;
+    padding: 16px;
   }
 }

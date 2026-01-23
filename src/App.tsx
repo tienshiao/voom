@@ -55,7 +55,7 @@ export function App() {
       },
       {
         root: scrollContainerRef.current,
-        rootMargin: "-80px 0px 0px 0px",
+        rootMargin: "0px 0px 0px 0px",
         threshold: 0,
       }
     );
