@@ -56,10 +56,10 @@ Then move the binary to your PATH:
 
 ```bash
 # macOS/Linux
-mv voom /usr/local/bin/
+mv dist-executables/voom /usr/local/bin/
 
 # Or add to a custom bin directory
-mv voom ~/bin/
+mv dist-executables/voom ~/bin/
 ```
 
 ### Cross-Platform Builds
@@ -109,8 +109,14 @@ Voom integrates with [Claude Code](https://docs.anthropic.com/en/docs/claude-cod
 Create a skill file at `~/.claude/commands/voom.md`:
 
 ```markdown
-Please run the `voom` command to collect code review feedback.
+Please run the `voom` command to collect code review feedback. The command is user interactive, do not use a timeout.
 Review the feedback and make necessary changes to the code to address the feedback.
+```
+
+**Alternative:** Run the install script:
+
+```bash
+bun run install:skill
 ```
 
 #### Usage
