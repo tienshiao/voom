@@ -1,9 +1,9 @@
 // build-all.ts
-import { build } from "bun";
+import { build, $ } from "bun";
 import * as fs from "fs";
 import * as path from "path";
 
-const entrypoint = "./src/index.ts"; // Replace with your entry file
+const entrypoint = "./src/index.ts";
 const outdir = "./dist-executables";
 
 const platforms = [
@@ -12,6 +12,13 @@ const platforms = [
   { platform: "linux", arch: "x64", target: "bun-linux-x64", outfile: "voom-linux-x64" },
   { platform: "win", arch: "x64", target: "bun-windows-x64", outfile: "voom-windows-x64.exe" },
 ];
+
+// Get version info
+const packageJson = await Bun.file("./package.json").json();
+const version = packageJson.version;
+const gitHash = (await $`git rev-parse --short HEAD`.text()).trim();
+
+console.log(`Building version ${version} (${gitHash})`);
 
 // Ensure the output directory exists
 if (!fs.existsSync(outdir)) {
@@ -30,6 +37,10 @@ for (const platform of platforms) {
       compile: {
         target: platform.target as any,
         outfile: platform.outfile,
+      },
+      define: {
+        __VERSION__: JSON.stringify(version),
+        __GIT_HASH__: JSON.stringify(gitHash),
       },
       minify: true,
       bytecode: true,

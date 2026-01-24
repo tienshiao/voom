@@ -7,7 +7,7 @@
     "dev": "bun --hot src/index.ts",
     "build": "bun build ./src/index.html --outdir=dist --sourcemap --target=browser --minify --define:process.env.NODE_ENV='\"production\"' --env='BUN_PUBLIC_*'",
     "start": "NODE_ENV=production bun src/index.ts",
-    "build:voom": "bun build --compile --minify --sourcemap ./src/index.ts --bytecode --outfile dist-executables/voom",
+    "build:voom": "bun run build-single.ts",
     "build:voom:all": "bun run build-all.ts",
     "install:skill": "mkdir -p ~/.claude/commands && cat > ~/.claude/commands/voom.md << 'EOF'\nPlease run the `voom` command to collect code review feedback. The command is user interactive, do not use a timeout.\nReview the feedback and make necessary changes to the code to address the feedback.\nEOF"
   },

@@ -3,6 +3,19 @@ import index from "./index.html";
 import { createApiRoutes } from "./api/handlers/index";
 import { resolveGitRoot, NotAGitRepoError } from "./api/utils";
 
+// Version info (injected at build time)
+declare const __VERSION__: string;
+declare const __GIT_HASH__: string;
+
+const VERSION = typeof __VERSION__ !== "undefined" ? __VERSION__ : "dev";
+const GIT_HASH = typeof __GIT_HASH__ !== "undefined" ? __GIT_HASH__ : "unknown";
+
+// Handle --version flag
+if (Bun.argv.includes("--version") || Bun.argv.includes("-v")) {
+  console.log(`voom ${VERSION} (${GIT_HASH})`);
+  process.exit(0);
+}
+
 // Configuration
 const DEFAULT_PORT = parseInt(process.env.PORT || "3010", 10);
 const MAX_PORT_ATTEMPTS = 10;
