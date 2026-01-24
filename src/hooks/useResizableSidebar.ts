@@ -16,9 +16,9 @@ interface UseResizableSidebarReturn {
   isMobile: boolean;
   crossingBreakpoint: boolean;
   // Refs for DOM elements
-  sidebarRef: React.RefObject<HTMLDivElement>;
-  headerRef: React.RefObject<HTMLDivElement>;
-  navRef: React.RefObject<HTMLDivElement>;
+  sidebarRef: React.RefObject<HTMLDivElement | null>;
+  headerRef: React.RefObject<HTMLDivElement | null>;
+  navRef: React.RefObject<HTMLDivElement | null>;
   // Handlers
   handleResizeMouseDown: (e: React.MouseEvent) => void;
   toggleSidebar: () => void;
