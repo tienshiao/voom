@@ -162,7 +162,7 @@ export function FileTree({ files, selectedFile, onSelectFile, viewedFiles, total
           </svg>
           <input
             type="text"
-            placeholder="Filter changed files"
+            placeholder="Filter files"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
             className="filter-input"

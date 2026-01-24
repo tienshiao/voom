@@ -31,6 +31,58 @@ body {
   position: sticky;
   top: 0;
   height: 100vh;
+  transition: width 0.2s ease, min-width 0.2s ease, transform 0.3s ease;
+}
+
+.diff-sidebar.collapsed {
+  width: 0 !important;
+  min-width: 0 !important;
+  border-right: none;
+  overflow: hidden;
+}
+
+/* Prevent sidebar contents from reflowing during collapse animation */
+.diff-sidebar > *:not(.sidebar-resize-handle) {
+  min-width: 200px;
+}
+
+/* Sidebar resize handle */
+.sidebar-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  cursor: col-resize;
+  background: transparent;
+  z-index: 10;
+}
+
+.sidebar-resize-handle:hover {
+  background: #0969da;
+}
+
+.diff-viewer.is-resizing .diff-sidebar {
+  transition: none;
+}
+
+.diff-viewer.is-resizing .diff-header {
+  transition: none;
+}
+
+.diff-viewer.is-resizing .single-file-nav {
+  transition: none;
+}
+
+.diff-viewer.is-resizing {
+  user-select: none;
+}
+
+/* Disable animations when crossing mobile/desktop breakpoint */
+.diff-viewer.crossing-breakpoint .diff-sidebar,
+.diff-viewer.crossing-breakpoint .diff-header,
+.diff-viewer.crossing-breakpoint .single-file-nav {
+  transition: none !important;
 }
 
 .sidebar-header {
@@ -85,6 +137,29 @@ body {
   right: 0;
   z-index: 20;
   height: 80px;
+  transition: left 0.2s ease;
+  container-type: inline-size;
+}
+
+/* Sidebar toggle button */
+.sidebar-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  padding: 0;
+  background: transparent;
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #656d76;
+  flex-shrink: 0;
+}
+
+.sidebar-toggle-btn:hover {
+  background: #f6f8fa;
+  color: #24292f;
 }
 
 
@@ -107,6 +182,12 @@ body {
   border-radius: 6px;
   font-size: 12px;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  direction: rtl;
+  text-align: left;
 }
 
 .refresh-btn {
@@ -192,15 +273,15 @@ body {
 .viewed-progress {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
   margin-left: auto;
   margin-right: 16px;
 }
 
 .viewed-progress-bar {
-  width: 120px;
-  height: 8px;
-  border-radius: 4px;
+  width: 80px;
+  height: 6px;
+  border-radius: 3px;
   overflow: hidden;
   appearance: none;
   background: #d0d7de;
@@ -208,21 +289,21 @@ body {
 
 .viewed-progress-bar::-webkit-progress-bar {
   background: #d0d7de;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .viewed-progress-bar::-webkit-progress-value {
   background: #2da44e;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .viewed-progress-bar::-moz-progress-bar {
   background: #2da44e;
-  border-radius: 4px;
+  border-radius: 3px;
 }
 
 .viewed-progress-text {
-  font-size: 12px;
+  font-size: 11px;
   color: #656d76;
   white-space: nowrap;
 }
@@ -236,6 +317,7 @@ body {
   padding: 5px 16px;
   font-weight: 500;
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .no-feedback-btn:hover {
@@ -269,6 +351,7 @@ body {
   border: 1px solid #d0d7de;
   border-radius: 6px;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .mode-btn {
@@ -279,6 +362,7 @@ body {
   font-weight: 500;
   cursor: pointer;
   color: #656d76;
+  white-space: nowrap;
 }
 
 .mode-btn:not(:last-child) {
@@ -292,6 +376,20 @@ body {
 .mode-btn-active {
   background: #0969da;
   color: #ffffff;
+}
+
+.mode-btn-compact {
+  display: none;
+}
+
+/* Use container query to react to diff-header width, not viewport */
+@container (max-width: 600px) {
+  .mode-btn-full {
+    display: none;
+  }
+  .mode-btn-compact {
+    display: inline;
+  }
 }
 
 /* Single file navigation bar - floating at bottom */
@@ -310,6 +408,7 @@ body {
   left: 50%;
   transform: translateX(calc(-50% + 150px));
   z-index: 100;
+  transition: transform 0.2s ease;
 }
 
 .nav-btn {
@@ -338,26 +437,48 @@ body {
   text-align: center;
 }
 
+/* Mobile drawer backdrop */
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+}
+
 @media (max-width: 768px) {
   .diff-viewer {
-    flex-direction: column;
-  }
-
-  .diff-sidebar {
-    width: 100%;
-    min-width: 100%;
-    height: auto;
-    max-height: 250px;
     position: relative;
   }
 
-  .diff-header {
+  .diff-sidebar.mobile-drawer {
+    position: fixed;
     left: 0;
+    top: 0;
+    width: 85vw !important;
+    max-width: 350px !important;
+    min-width: 250px !important;
+    height: 100vh;
+    z-index: 1000;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
+
+  .diff-sidebar.mobile-drawer:not(.collapsed) {
+    transform: translateX(0);
+    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
+  }
+
+  .diff-header {
+    left: 0 !important;
   }
 
   .diff-main {
-    height: calc(100vh - 80px);
     margin-top: 80px;
     padding: 16px;
+  }
+
+  .single-file-nav {
+    transform: translateX(-50%);
+    left: 50%;
   }
 }

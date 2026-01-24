@@ -6,7 +6,9 @@ import { parseDiff } from "./utils/parseDiff";
 import { enhanceWithWordDiff } from "./utils/wordDiff";
 import { generatePrompt } from "./utils/generatePrompt";
 import { useComments } from "./hooks/useComments";
+import { useResizableSidebar } from "./hooks/useResizableSidebar";
 import type { DiffResponse, FileDiff, DiffHunk, HunkExpansionState, DiffLine } from "./types/diff";
+import { Menu, PanelLeftClose } from "lucide-react";
 import "./index.css";
 
 export function App() {
@@ -25,6 +27,19 @@ export function App() {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isScrollingToFile = useRef(false);
   const [viewMode, setViewMode] = useState<'all' | 'single'>('all');
+
+  const {
+    sidebarCollapsed,
+    sidebarWidth,
+    isMobile,
+    crossingBreakpoint,
+    sidebarRef,
+    headerRef,
+    navRef,
+    handleResizeMouseDown,
+    toggleSidebar,
+    closeSidebar,
+  } = useResizableSidebar();
 
   // Thresholds for auto-enabling single-file mode
   const FILE_COUNT_THRESHOLD = 30;
@@ -166,6 +181,9 @@ export function App() {
   const navigateToFile = (path: string) => {
     setSelectedFile(path);
     setExpandedFiles((prev) => new Set(prev).add(path));
+    if (isMobile) {
+      closeSidebar(); // Close drawer on file selection
+    }
     if (viewMode === 'all') {
       const element = document.getElementById(`file-${path.replace(/\//g, "-")}`);
       element?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -411,8 +429,15 @@ export function App() {
   }
 
   return (
-    <div className="diff-viewer">
-      <div className="diff-sidebar">
+    <div className={`diff-viewer ${crossingBreakpoint ? 'crossing-breakpoint' : ''}`}>
+      {isMobile && !sidebarCollapsed && (
+        <div className="drawer-backdrop" onClick={closeSidebar} />
+      )}
+      <div
+        ref={sidebarRef}
+        className={`diff-sidebar ${sidebarCollapsed ? 'collapsed' : ''} ${isMobile ? 'mobile-drawer' : ''}`}
+        style={!isMobile && !sidebarCollapsed ? { width: sidebarWidth, minWidth: sidebarWidth } : undefined}
+      >
         <FileTree
           files={files}
           selectedFile={selectedFile}
@@ -421,28 +446,44 @@ export function App() {
           totalAdditions={totalAdditions}
           totalDeletions={totalDeletions}
         />
+        {!isMobile && !sidebarCollapsed && (
+          <div className="sidebar-resize-handle" onMouseDown={handleResizeMouseDown} />
+        )}
       </div>
       <div className="diff-main" ref={scrollContainerRef}>
-        <div className="diff-header">
+        <div
+          ref={headerRef}
+          className="diff-header"
+          style={!isMobile ? { left: sidebarCollapsed ? 0 : sidebarWidth } : undefined}
+        >
           <div className="diff-header-row">
-            <h1>Code Review</h1>
+            <h1>Voom</h1>
             {diffData?.directory && (
               <span className="directory-badge">{diffData.directory}</span>
             )}
           </div>
           <div className="diff-header-row">
+            <button
+              className="sidebar-toggle-btn"
+              onClick={toggleSidebar}
+              title={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
+            >
+              {sidebarCollapsed ? <Menu size={16} /> : <PanelLeftClose size={16} />}
+            </button>
             <div className="view-mode-toggle">
               <button
                 className={`mode-btn ${viewMode === 'all' ? 'mode-btn-active' : ''}`}
                 onClick={() => setViewMode('all')}
               >
-                All Files
+                <span className="mode-btn-full">All Files</span>
+                <span className="mode-btn-compact">All</span>
               </button>
               <button
                 className={`mode-btn ${viewMode === 'single' ? 'mode-btn-active' : ''}`}
                 onClick={() => setViewMode('single')}
               >
-                Single File
+                <span className="mode-btn-full">Single File</span>
+                <span className="mode-btn-compact">Single</span>
               </button>
             </div>
             <div className="viewed-progress">
@@ -517,7 +558,11 @@ export function App() {
           )}
         </div>
         {viewMode === 'single' && (
-          <div className="single-file-nav">
+          <div
+            ref={navRef}
+            className="single-file-nav"
+            style={!isMobile ? { transform: `translateX(calc(-50% + ${sidebarCollapsed ? 0 : sidebarWidth / 2}px))` } : undefined}
+          >
             <button
               className="nav-btn"
               onClick={navigateToPrevFile}
