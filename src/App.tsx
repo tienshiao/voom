@@ -7,8 +7,9 @@ import { enhanceWithWordDiff } from "./utils/wordDiff";
 import { generatePrompt } from "./utils/generatePrompt";
 import { useComments } from "./hooks/useComments";
 import { useResizableSidebar } from "./hooks/useResizableSidebar";
+import { useTheme } from "./hooks/useTheme";
 import type { DiffResponse, FileDiff, DiffHunk, HunkExpansionState, DiffLine } from "./types/diff";
-import { Menu, PanelLeftClose } from "lucide-react";
+import { Menu, PanelLeftClose, Sun, Moon } from "lucide-react";
 import "./index.css";
 
 export function App() {
@@ -40,6 +41,8 @@ export function App() {
     toggleSidebar,
     closeSidebar,
   } = useResizableSidebar();
+
+  const { theme, resolvedTheme, cycleTheme } = useTheme();
 
   // Thresholds for auto-enabling single-file mode
   const FILE_COUNT_THRESHOLD = 30;
@@ -464,6 +467,14 @@ export function App() {
             {diffData?.directory && (
               <span className="directory-badge">{diffData.directory}</span>
             )}
+            <button
+              className="theme-toggle-btn"
+              onClick={cycleTheme}
+              title={`Theme: ${theme}`}
+            >
+              {resolvedTheme === "light" ? <Sun size={14} /> : <Moon size={14} />}
+              {theme === "auto" && <span className="theme-auto-indicator" />}
+            </button>
           </div>
           <div className="diff-header-row">
             <button

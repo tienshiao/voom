@@ -1,9 +1,96 @@
 :root {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
   line-height: 1.5;
-  color: #1f2328;
-  background-color: #f6f8fa;
   font-size: 14px;
+
+  /* Core colors */
+  --voom-bg-primary: #f6f8fa;
+  --voom-bg-secondary: #ffffff;
+  --voom-bg-tertiary: #f6f8fa;
+  --voom-text-primary: #1f2328;
+  --voom-text-secondary: #656d76;
+  --voom-text-tertiary: #24292f;
+  --voom-border-default: #d0d7de;
+  --voom-accent-primary: #0969da;
+  --voom-accent-hover: #0860ca;
+
+  /* Diff colors */
+  --voom-diff-add-bg: #dafbe1;
+  --voom-diff-add-line-num: #ccffd8;
+  --voom-diff-add-text: #1a7f37;
+  --voom-diff-add-highlight: #6fdd8b;
+  --voom-diff-del-bg: #ffebe9;
+  --voom-diff-del-line-num: #ffd7d5;
+  --voom-diff-del-text: #cf222e;
+  --voom-diff-del-highlight: #ffaba8;
+  --voom-diff-hunk-bg: #ddf4ff;
+  --voom-diff-context-bg: #f0f6fc;
+  --voom-diff-context-line-num: #e6edf5;
+
+  /* Button colors */
+  --voom-btn-default-bg: #f6f8fa;
+  --voom-btn-default-hover: #f3f4f6;
+  --voom-btn-primary-bg: #2da44e;
+  --voom-btn-primary-hover: #2c974b;
+  --voom-btn-primary-disabled: #94d3a2;
+  --voom-btn-danger-bg: #cf222e;
+  --voom-btn-danger-hover: #a40e26;
+
+  /* Misc */
+  --voom-shadow-color: rgba(0, 0, 0, 0.1);
+  --voom-shadow-lg: rgba(0, 0, 0, 0.12);
+  --voom-backdrop: rgba(0, 0, 0, 0.5);
+  --voom-badge-bg: #ddf4ff;
+  --voom-viewed-bg: #dafbe1;
+  --voom-viewed-hover: #aceebb;
+  --voom-delete-confirm-bg: #ffebe9;
+
+  color: var(--voom-text-primary);
+  background-color: var(--voom-bg-primary);
+}
+
+[data-theme="dark"] {
+  /* Core colors */
+  --voom-bg-primary: #0d1117;
+  --voom-bg-secondary: #161b22;
+  --voom-bg-tertiary: #21262d;
+  --voom-text-primary: #e6edf3;
+  --voom-text-secondary: #8b949e;
+  --voom-text-tertiary: #c9d1d9;
+  --voom-border-default: #30363d;
+  --voom-accent-primary: #58a6ff;
+  --voom-accent-hover: #79b8ff;
+
+  /* Diff colors */
+  --voom-diff-add-bg: #122117;
+  --voom-diff-add-line-num: #1b4721;
+  --voom-diff-add-text: #3fb950;
+  --voom-diff-add-highlight: #196c2e;
+  --voom-diff-del-bg: #2d1619;
+  --voom-diff-del-line-num: #4a1f23;
+  --voom-diff-del-text: #f85149;
+  --voom-diff-del-highlight: #8e2b28;
+  --voom-diff-hunk-bg: #1c2128;
+  --voom-diff-context-bg: #161b22;
+  --voom-diff-context-line-num: #1c2128;
+
+  /* Button colors */
+  --voom-btn-default-bg: #21262d;
+  --voom-btn-default-hover: #30363d;
+  --voom-btn-primary-bg: #238636;
+  --voom-btn-primary-hover: #2ea043;
+  --voom-btn-primary-disabled: #1b4721;
+  --voom-btn-danger-bg: #da3633;
+  --voom-btn-danger-hover: #f85149;
+
+  /* Misc */
+  --voom-shadow-color: rgba(0, 0, 0, 0.3);
+  --voom-shadow-lg: rgba(0, 0, 0, 0.4);
+  --voom-backdrop: rgba(0, 0, 0, 0.7);
+  --voom-badge-bg: #1c2128;
+  --voom-viewed-bg: #122117;
+  --voom-viewed-hover: #1b4721;
+  --voom-delete-confirm-bg: #2d1619;
 }
 
 * {
@@ -23,8 +110,8 @@ body {
 .diff-sidebar {
   width: 300px;
   min-width: 300px;
-  background: #ffffff;
-  border-right: 1px solid #d0d7de;
+  background: var(--voom-bg-secondary);
+  border-right: 1px solid var(--voom-border-default);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -59,7 +146,7 @@ body {
 }
 
 .sidebar-resize-handle:hover {
-  background: #0969da;
+  background: var(--voom-accent-primary);
 }
 
 .diff-viewer.is-resizing .diff-sidebar {
@@ -87,7 +174,7 @@ body {
 
 .sidebar-header {
   padding: 8px 16px;
-  border-bottom: 1px solid #d0d7de;
+  border-bottom: 1px solid var(--voom-border-default);
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -108,11 +195,11 @@ body {
 }
 
 .stat-add {
-  color: #1a7f37;
+  color: var(--voom-diff-add-text);
 }
 
 .stat-del {
-  color: #cf222e;
+  color: var(--voom-diff-del-text);
 }
 
 .diff-main {
@@ -129,8 +216,8 @@ body {
   justify-content: center;
   gap: 4px;
   padding: 8px 24px;
-  border-bottom: 1px solid #d0d7de;
-  background: #f6f8fa;
+  border-bottom: 1px solid var(--voom-border-default);
+  background: var(--voom-bg-tertiary);
   position: fixed;
   top: 0;
   left: 300px;
@@ -150,18 +237,48 @@ body {
   height: 26px;
   padding: 0;
   background: transparent;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--voom-border-default);
   border-radius: 6px;
   cursor: pointer;
-  color: #656d76;
+  color: var(--voom-text-secondary);
   flex-shrink: 0;
 }
 
 .sidebar-toggle-btn:hover {
-  background: #f6f8fa;
-  color: #24292f;
+  background: var(--voom-btn-default-bg);
+  color: var(--voom-text-tertiary);
 }
 
+/* Theme toggle button */
+.theme-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: 26px;
+  height: 26px;
+  background: transparent;
+  border: 1px solid var(--voom-border-default);
+  border-radius: 6px;
+  cursor: pointer;
+  color: var(--voom-text-secondary);
+  margin-left: auto;
+}
+
+.theme-toggle-btn:hover {
+  background: var(--voom-btn-default-bg);
+  color: var(--voom-text-tertiary);
+}
+
+.theme-auto-indicator {
+  position: absolute;
+  bottom: 1px;
+  right: 1px;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--voom-accent-primary);
+}
 
 .diff-header-row {
   display: flex;
@@ -176,8 +293,8 @@ body {
 }
 
 .directory-badge {
-  background: #ddf4ff;
-  color: #0969da;
+  background: var(--voom-badge-bg);
+  color: var(--voom-accent-primary);
   padding: 4px 8px;
   border-radius: 6px;
   font-size: 12px;
@@ -192,16 +309,17 @@ body {
 
 .refresh-btn {
   margin-left: auto;
-  background: #f6f8fa;
-  border: 1px solid #d0d7de;
+  background: var(--voom-btn-default-bg);
+  border: 1px solid var(--voom-border-default);
   border-radius: 6px;
   padding: 5px 16px;
   font-weight: 500;
   cursor: pointer;
+  color: var(--voom-text-primary);
 }
 
 .refresh-btn:hover {
-  background: #f3f4f6;
+  background: var(--voom-btn-default-hover);
 }
 
 .diff-files {
@@ -229,7 +347,7 @@ body {
 }
 
 .loading {
-  color: #656d76;
+  color: var(--voom-text-secondary);
   font-size: 16px;
 }
 
@@ -242,20 +360,20 @@ body {
 .error p,
 .empty-state p {
   margin: 0 0 16px;
-  color: #656d76;
+  color: var(--voom-text-secondary);
 }
 
 .directory-info {
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
   font-size: 12px;
-  background: #f6f8fa;
+  background: var(--voom-bg-tertiary);
   padding: 8px 12px;
   border-radius: 6px;
 }
 
 .error button,
 .empty-state button {
-  background: #2da44e;
+  background: var(--voom-btn-primary-bg);
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -266,7 +384,7 @@ body {
 
 .error button:hover,
 .empty-state button:hover {
-  background: #2c974b;
+  background: var(--voom-btn-primary-hover);
 }
 
 /* Viewed Progress Bar */
@@ -284,35 +402,35 @@ body {
   border-radius: 3px;
   overflow: hidden;
   appearance: none;
-  background: #d0d7de;
+  background: var(--voom-border-default);
 }
 
 .viewed-progress-bar::-webkit-progress-bar {
-  background: #d0d7de;
+  background: var(--voom-border-default);
   border-radius: 3px;
 }
 
 .viewed-progress-bar::-webkit-progress-value {
-  background: #2da44e;
+  background: var(--voom-btn-primary-bg);
   border-radius: 3px;
 }
 
 .viewed-progress-bar::-moz-progress-bar {
-  background: #2da44e;
+  background: var(--voom-btn-primary-bg);
   border-radius: 3px;
 }
 
 .viewed-progress-text {
   font-size: 11px;
-  color: #656d76;
+  color: var(--voom-text-secondary);
   white-space: nowrap;
 }
 
 /* No Feedback button */
 .no-feedback-btn {
   background: transparent;
-  color: #24292f;
-  border: 1px solid #d0d7de;
+  color: var(--voom-text-tertiary);
+  border: 1px solid var(--voom-border-default);
   border-radius: 6px;
   padding: 5px 16px;
   font-weight: 500;
@@ -321,13 +439,13 @@ body {
 }
 
 .no-feedback-btn:hover {
-  background: #eaeef2;
-  border-color: #afb8c1;
+  background: var(--voom-btn-default-hover);
+  border-color: var(--voom-border-default);
 }
 
 /* Prompt button */
 .prompt-btn {
-  background: #2da44e;
+  background: var(--voom-btn-primary-bg);
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -337,44 +455,44 @@ body {
 }
 
 .prompt-btn:hover:not(:disabled) {
-  background: #2c974b;
+  background: var(--voom-btn-primary-hover);
 }
 
 .prompt-btn:disabled {
-  background: #94d3a2;
+  background: var(--voom-btn-primary-disabled);
   cursor: not-allowed;
 }
 
 /* View mode toggle */
 .view-mode-toggle {
   display: flex;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--voom-border-default);
   border-radius: 6px;
   overflow: hidden;
   flex-shrink: 0;
 }
 
 .mode-btn {
-  background: #f6f8fa;
+  background: var(--voom-btn-default-bg);
   border: none;
   padding: 5px 12px;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
-  color: #656d76;
+  color: var(--voom-text-secondary);
   white-space: nowrap;
 }
 
 .mode-btn:not(:last-child) {
-  border-right: 1px solid #d0d7de;
+  border-right: 1px solid var(--voom-border-default);
 }
 
 .mode-btn:hover:not(.mode-btn-active) {
-  background: #f3f4f6;
+  background: var(--voom-btn-default-hover);
 }
 
 .mode-btn-active {
-  background: #0969da;
+  background: var(--voom-accent-primary);
   color: #ffffff;
 }
 
@@ -399,10 +517,10 @@ body {
   justify-content: center;
   gap: 16px;
   padding: 12px 24px;
-  background: #ffffff;
-  border: 1px solid #d0d7de;
+  background: var(--voom-bg-secondary);
+  border: 1px solid var(--voom-border-default);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 2px 8px var(--voom-shadow-lg);
   position: fixed;
   bottom: 24px;
   left: 50%;
@@ -412,17 +530,18 @@ body {
 }
 
 .nav-btn {
-  background: #f6f8fa;
-  border: 1px solid #d0d7de;
+  background: var(--voom-btn-default-bg);
+  border: 1px solid var(--voom-border-default);
   border-radius: 6px;
   padding: 6px 16px;
   font-weight: 500;
   cursor: pointer;
   font-size: 13px;
+  color: var(--voom-text-primary);
 }
 
 .nav-btn:hover:not(:disabled) {
-  background: #f3f4f6;
+  background: var(--voom-btn-default-hover);
 }
 
 .nav-btn:disabled {
@@ -432,7 +551,7 @@ body {
 
 .nav-position {
   font-size: 14px;
-  color: #656d76;
+  color: var(--voom-text-secondary);
   min-width: 80px;
   text-align: center;
 }
@@ -441,7 +560,7 @@ body {
 .drawer-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--voom-backdrop);
   z-index: 999;
 }
 
@@ -465,7 +584,7 @@ body {
 
   .diff-sidebar.mobile-drawer:not(.collapsed) {
     transform: translateX(0);
-    box-shadow: 4px 0 16px rgba(0, 0, 0, 0.15);
+    box-shadow: 4px 0 16px var(--voom-shadow-lg);
   }
 
   .diff-header {

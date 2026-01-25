@@ -4,7 +4,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: var(--voom-backdrop);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -12,9 +12,9 @@
 }
 
 .prompt-modal {
-  background: #ffffff;
+  background: var(--voom-bg-secondary);
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 8px 32px var(--voom-shadow-lg);
   width: 90%;
   max-width: 800px;
   max-height: 80vh;
@@ -27,7 +27,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #d0d7de;
+  border-bottom: 1px solid var(--voom-border-default);
 }
 
 .prompt-modal-header h2 {
@@ -41,7 +41,7 @@
   border: none;
   padding: 4px;
   cursor: pointer;
-  color: #656d76;
+  color: var(--voom-text-secondary);
   border-radius: 4px;
   display: flex;
   align-items: center;
@@ -49,8 +49,8 @@
 }
 
 .prompt-modal-close:hover {
-  background: #f6f8fa;
-  color: #1f2328;
+  background: var(--voom-btn-default-bg);
+  color: var(--voom-text-primary);
 }
 
 .prompt-modal-content {
@@ -72,7 +72,7 @@
   display: flex;
   justify-content: flex-end;
   padding: 16px 20px;
-  border-top: 1px solid #d0d7de;
+  border-top: 1px solid var(--voom-border-default);
 }
 
 .prompt-modal-footer {
@@ -80,7 +80,7 @@
 }
 
 .btn-primary {
-  background: #2da44e;
+  background: var(--voom-btn-primary-bg);
   color: #ffffff;
   border: none;
   border-radius: 6px;
@@ -91,18 +91,18 @@
 }
 
 .btn-primary:hover {
-  background: #2c974b;
+  background: var(--voom-btn-primary-hover);
 }
 
 .btn-primary:disabled {
-  background: #94d3a2;
+  background: var(--voom-btn-primary-disabled);
   cursor: not-allowed;
 }
 
 .btn-secondary {
-  background: #f6f8fa;
-  color: #24292f;
-  border: 1px solid #d0d7de;
+  background: var(--voom-btn-default-bg);
+  color: var(--voom-text-tertiary);
+  border: 1px solid var(--voom-border-default);
   border-radius: 6px;
   padding: 8px 16px;
   font-weight: 500;
@@ -111,8 +111,8 @@
 }
 
 .btn-secondary:hover {
-  background: #f3f4f6;
-  border-color: #c9d1d9;
+  background: var(--voom-btn-default-hover);
+  border-color: var(--voom-border-default);
 }
 
 .prompt-modal-sent {
@@ -131,11 +131,11 @@
   margin: 0;
   font-size: 20px;
   font-weight: 600;
-  color: #1f2328;
+  color: var(--voom-text-primary);
 }
 
 .sent-message p {
   margin: 0;
-  color: #656d76;
+  color: var(--voom-text-secondary);
   font-size: 14px;
 }
