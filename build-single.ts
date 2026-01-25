@@ -26,6 +26,7 @@ await build({
   define: {
     __VERSION__: JSON.stringify(version),
     __GIT_HASH__: JSON.stringify(gitHash),
+    "process.env.NODE_ENV": JSON.stringify("production"),
   },
   minify: true,
   bytecode: true,
