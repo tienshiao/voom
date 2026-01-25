@@ -95,13 +95,25 @@ function isAddressInUseError(error: unknown): boolean {
     console.log(`Voom running at ${server.url}`);
   }
 
-  // Open the browser automatically (cross-platform, fire-and-forget)
-  const url = server.url.href;
-  if (process.platform === "darwin") {
-    Bun.spawn(["open", url]);
-  } else if (process.platform === "win32") {
-    Bun.spawn(["cmd", "/c", "start", url]);
-  } else {
-    Bun.spawn(["xdg-open", url]);
+  // Wait for server to be fully ready, then open browser
+  async function openBrowserWhenReady(url: string) {
+    // Warm up the server by fetching the root page
+    try {
+      await fetch(url);
+    } catch {
+      // Ignore fetch errors - server should be ready since we just started it
+    }
+
+    // Now open the browser
+    if (process.platform === "darwin") {
+      Bun.spawn(["open", url]);
+    } else if (process.platform === "win32") {
+      Bun.spawn(["cmd", "/c", "start", url]);
+    } else {
+      Bun.spawn(["xdg-open", url]);
+    }
   }
+
+  // Open browser (fire-and-forget)
+  openBrowserWhenReady(server.url.href);
 })();
