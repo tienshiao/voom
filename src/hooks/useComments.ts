@@ -1,6 +1,18 @@
 import { useState, useCallback } from "react";
 import type { LineComment } from "../types/diff";
 
+function generateUUID(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  // Fallback for insecure contexts where crypto.randomUUID is unavailable
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+  });
+}
+
 export function useComments() {
   const [comments, setComments] = useState<Map<string, LineComment>>(new Map());
   const [activeCommentLines, setActiveCommentLines] = useState<Set<string>>(new Set());
@@ -41,7 +53,7 @@ export function useComments() {
       const now = Date.now();
 
       const comment: LineComment = {
-        id: existingComment?.id || crypto.randomUUID(),
+        id: existingComment?.id || generateUUID(),
         filePath,
         lineNumber,
         lineType,
@@ -75,7 +87,7 @@ export function useComments() {
       const now = Date.now();
 
       const comment: LineComment = {
-        id: existingComment?.id || crypto.randomUUID(),
+        id: existingComment?.id || generateUUID(),
         filePath,
         lineType: 'file',
         content,
