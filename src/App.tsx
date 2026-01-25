@@ -347,10 +347,17 @@ export function App() {
         return;
       }
 
+      // Calculate offset between new and old line numbers
+      // For "before": offset at hunk start
+      // For "after": offset at hunk end (accounts for additions/deletions within the hunk)
+      const offset = direction === "before"
+        ? hunk.newStart - hunk.oldStart
+        : (hunk.newStart + hunk.newCount) - (hunk.oldStart + hunk.oldCount);
+
       const newLines: DiffLine[] = data.lines.map((line: { lineNum: number; content: string }) => ({
         type: "context" as const,
         content: line.content,
-        oldLineNum: line.lineNum,
+        oldLineNum: line.lineNum - offset,
         newLineNum: line.lineNum,
       }));
 
