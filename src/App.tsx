@@ -187,6 +187,9 @@ export function App() {
     if (viewMode === 'all') {
       const element = document.getElementById(`file-${path.replace(/\//g, "-")}`);
       element?.scrollIntoView({ behavior: "smooth", block: "start" });
+    } else {
+      // In single file mode, reset scroll to top
+      scrollContainerRef.current?.scrollTo({ top: 0 });
     }
   };
 
