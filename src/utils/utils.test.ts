@@ -393,7 +393,7 @@ describe("enhanceWithWordDiff", () => {
     expect(additionLine!.segments).toBeDefined();
   });
 
-  test("does not add segments to unpaired lines", () => {
+  test("unpaired lines get syntax highlighting but no word-diff highlighting", () => {
     const diff = `diff --git a/test.ts b/test.ts
 --- a/test.ts
 +++ b/test.ts
@@ -410,12 +410,14 @@ describe("enhanceWithWordDiff", () => {
     const deletionLine = hunk.lines.find(l => l.type === "deletion");
     const additionLines = hunk.lines.filter(l => l.type === "addition");
 
-    // First deletion/addition pair should have segments
+    // First deletion/addition pair should have segments with word-diff
     expect(deletionLine!.segments).toBeDefined();
     expect(additionLines[0]!.segments).toBeDefined();
 
-    // Second addition (unpaired) should not have segments
-    expect(additionLines[1]!.segments).toBeUndefined();
+    // Second addition (unpaired) gets syntax highlighting segments but no word-diff highlights
+    expect(additionLines[1]!.segments).toBeDefined();
+    // All segments should have highlighted: false (no word-diff highlighting)
+    expect(additionLines[1]!.segments!.every(s => s.highlighted === false)).toBe(true);
   });
 
   test("handles multiple deletion/addition pairs", () => {

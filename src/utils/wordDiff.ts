@@ -1,4 +1,7 @@
-import type { TextSegment, FileDiff } from "../types/diff";
+import type { TextSegment, FileDiff, SyntaxTokenType } from "../types/diff";
+import { tokenizeLine, mergeTokens } from "./syntaxHighlight";
+import { getLanguageFromPath } from "./languageDetection";
+import type { LanguageConfig } from "./languageDetection";
 
 // Tokenize a string into words and whitespace
 function tokenize(str: string): string[] {
@@ -119,9 +122,82 @@ export function computeWordDiff(
   };
 }
 
-// Enhance parsed diff files with word-level highlighting
+// Apply syntax highlighting to a line and return segments with syntax types
+function applySyntaxToLine(
+  content: string,
+  config: LanguageConfig | null
+): TextSegment[] {
+  const tokens = mergeTokens(tokenizeLine(content, config));
+  return tokens.map((token) => ({
+    text: token.text,
+    highlighted: false,
+    syntaxType: token.type || undefined,
+  }));
+}
+
+// Apply syntax highlighting to existing word-diff segments
+function applySyntaxToSegments(
+  segments: TextSegment[],
+  config: LanguageConfig | null
+): TextSegment[] {
+  if (!config) return segments;
+
+  // Reconstruct the full line to tokenize properly
+  const fullLine = segments.map((s) => s.text).join('');
+  const syntaxTokens = mergeTokens(tokenizeLine(fullLine, config));
+
+  // Map syntax tokens back to word-diff segments
+  const result: TextSegment[] = [];
+  let segmentIndex = 0;
+  let segmentOffset = 0;
+
+  for (const token of syntaxTokens) {
+    let tokenRemaining = token.text;
+
+    while (tokenRemaining.length > 0 && segmentIndex < segments.length) {
+      const segment = segments[segmentIndex]!;
+      const segmentText = segment.text.slice(segmentOffset);
+      const takeLength = Math.min(tokenRemaining.length, segmentText.length);
+
+      result.push({
+        text: tokenRemaining.slice(0, takeLength),
+        highlighted: segment.highlighted,
+        syntaxType: token.type || undefined,
+      });
+
+      tokenRemaining = tokenRemaining.slice(takeLength);
+      segmentOffset += takeLength;
+
+      if (segmentOffset >= segment.text.length) {
+        segmentIndex++;
+        segmentOffset = 0;
+      }
+    }
+  }
+
+  // Merge adjacent segments with same properties
+  const merged: TextSegment[] = [];
+  for (const seg of result) {
+    const last = merged[merged.length - 1];
+    if (
+      last &&
+      last.highlighted === seg.highlighted &&
+      last.syntaxType === seg.syntaxType
+    ) {
+      last.text += seg.text;
+    } else {
+      merged.push({ ...seg });
+    }
+  }
+
+  return merged;
+}
+
+// Enhance parsed diff files with word-level highlighting and syntax highlighting
 export function enhanceWithWordDiff(files: FileDiff[]): FileDiff[] {
   for (const file of files) {
+    const langConfig = getLanguageFromPath(file.newPath);
+
     for (const hunk of file.hunks) {
       const lines = hunk.lines;
       let i = 0;
@@ -170,9 +246,38 @@ export function enhanceWithWordDiff(files: FileDiff[]): FileDiff[] {
               addLine.content
             );
 
-            delLine.segments = deletionSegments;
-            addLine.segments = additionSegments;
+            // Apply syntax highlighting to word-diff segments
+            delLine.segments = applySyntaxToSegments(deletionSegments, langConfig);
+            addLine.segments = applySyntaxToSegments(additionSegments, langConfig);
           }
+
+          // Handle unpaired deletions (apply syntax only)
+          for (let p = pairCount; p < deletions.length; p++) {
+            const delIdx = deletions[p];
+            if (delIdx === undefined) continue;
+            const delLine = lines[delIdx];
+            if (delLine) {
+              delLine.segments = applySyntaxToLine(delLine.content, langConfig);
+            }
+          }
+
+          // Handle unpaired additions (apply syntax only)
+          for (let p = pairCount; p < additions.length; p++) {
+            const addIdx = additions[p];
+            if (addIdx === undefined) continue;
+            const addLine = lines[addIdx];
+            if (addLine) {
+              addLine.segments = applySyntaxToLine(addLine.content, langConfig);
+            }
+          }
+        } else if (currentLine && currentLine.type === "context") {
+          // Apply syntax highlighting to context lines
+          currentLine.segments = applySyntaxToLine(currentLine.content, langConfig);
+          i++;
+        } else if (currentLine && currentLine.type === "addition") {
+          // Standalone addition (not preceded by deletion) - apply syntax only
+          currentLine.segments = applySyntaxToLine(currentLine.content, langConfig);
+          i++;
         } else {
           i++;
         }

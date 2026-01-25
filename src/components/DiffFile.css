@@ -386,3 +386,33 @@
   font-size: 13px;
 }
 
+/* Syntax highlighting */
+.syntax-keyword {
+  color: var(--voom-syntax-keyword);
+}
+
+.syntax-string {
+  color: var(--voom-syntax-string);
+}
+
+.syntax-comment {
+  color: var(--voom-syntax-comment);
+  font-style: italic;
+}
+
+.syntax-number {
+  color: var(--voom-syntax-number);
+}
+
+.syntax-operator {
+  color: var(--voom-syntax-operator);
+}
+
+.syntax-type {
+  color: var(--voom-syntax-type);
+}
+
+.syntax-punctuation {
+  color: var(--voom-syntax-punctuation);
+}
+

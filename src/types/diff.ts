@@ -3,9 +3,19 @@ export interface DiffResponse {
   directory: string;
 }
 
+export type SyntaxTokenType =
+  | 'keyword'
+  | 'string'
+  | 'comment'
+  | 'number'
+  | 'operator'
+  | 'type'
+  | 'punctuation';
+
 export interface TextSegment {
   text: string;
   highlighted: boolean;
+  syntaxType?: SyntaxTokenType;
 }
 
 export interface DiffLine {

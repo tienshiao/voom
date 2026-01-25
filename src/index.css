@@ -45,6 +45,15 @@
   --voom-viewed-hover: #aceebb;
   --voom-delete-confirm-bg: #ffebe9;
 
+  /* Syntax highlighting colors */
+  --voom-syntax-keyword: #cf222e;
+  --voom-syntax-string: #0a3069;
+  --voom-syntax-comment: #6e7781;
+  --voom-syntax-number: #0550ae;
+  --voom-syntax-operator: #24292f;
+  --voom-syntax-type: #8250df;
+  --voom-syntax-punctuation: #24292f;
+
   color: var(--voom-text-primary);
   background-color: var(--voom-bg-primary);
 }
@@ -91,6 +100,15 @@
   --voom-viewed-bg: #122117;
   --voom-viewed-hover: #1b4721;
   --voom-delete-confirm-bg: #2d1619;
+
+  /* Syntax highlighting colors */
+  --voom-syntax-keyword: #ff7b72;
+  --voom-syntax-string: #a5d6ff;
+  --voom-syntax-comment: #8b949e;
+  --voom-syntax-number: #79c0ff;
+  --voom-syntax-operator: #c9d1d9;
+  --voom-syntax-type: #d2a8ff;
+  --voom-syntax-punctuation: #c9d1d9;
 }
 
 * {

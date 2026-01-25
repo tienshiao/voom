@@ -104,7 +104,20 @@ function ContextLine({
             <Plus size={14} />
           </button>
           <span className="line-prefix"> </span>
-          <span className="line-text">{line.content}</span>
+          <span className="line-text">
+            {line.segments ? (
+              line.segments.map((seg, i) => {
+                const className = seg.syntaxType ? `syntax-${seg.syntaxType}` : undefined;
+                return (
+                  <span key={i} className={className}>
+                    {seg.text}
+                  </span>
+                );
+              })
+            ) : (
+              line.content
+            )}
+          </span>
         </td>
       </tr>
       {comment && !isActive && (
@@ -443,18 +456,23 @@ export function DiffFile({
                               </span>
                               <span className="line-text">
                                 {line.segments ? (
-                                  line.segments.map((seg, i) => (
-                                    <span
-                                      key={i}
-                                      className={
-                                        seg.highlighted
-                                          ? `word-highlight-${line.type}`
-                                          : ""
-                                      }
-                                    >
-                                      {seg.text}
-                                    </span>
-                                  ))
+                                  line.segments.map((seg, i) => {
+                                    const classes: string[] = [];
+                                    if (seg.highlighted) {
+                                      classes.push(`word-highlight-${line.type}`);
+                                    }
+                                    if (seg.syntaxType) {
+                                      classes.push(`syntax-${seg.syntaxType}`);
+                                    }
+                                    return (
+                                      <span
+                                        key={i}
+                                        className={classes.join(' ') || undefined}
+                                      >
+                                        {seg.text}
+                                      </span>
+                                    );
+                                  })
                                 ) : (
                                   line.content
                                 )}
