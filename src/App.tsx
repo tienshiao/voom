@@ -442,7 +442,10 @@ export function App() {
   }
 
   return (
-    <div className={`diff-viewer ${crossingBreakpoint ? 'crossing-breakpoint' : ''}`}>
+    <div
+      className={`diff-viewer ${crossingBreakpoint ? 'crossing-breakpoint' : ''}`}
+      style={{ '--sidebar-width': `${sidebarCollapsed ? 0 : sidebarWidth}px` } as React.CSSProperties}
+    >
       {isMobile && !sidebarCollapsed && (
         <div className="drawer-backdrop" onClick={closeSidebar} />
       )}

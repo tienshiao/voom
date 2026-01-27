@@ -308,20 +308,21 @@
 
 /* File-level comment styles */
 .file-comment-section {
-  padding: 8px 16px;
+  padding: 4px 8px;
   border-bottom: 1px solid var(--voom-border-default);
   background: var(--voom-bg-tertiary);
 }
 
 .file-comment-input-wrapper,
 .file-comment-display-wrapper {
-  margin: 8px 0;
+  margin: 4px 0;
 }
 
 .file-comment-input-wrapper .comment-input-container,
 .file-comment-display-wrapper .comment-container {
-  width: auto;
   margin: 0;
+  position: static;
+  max-width: none;
 }
 
 .add-file-comment-btn {
