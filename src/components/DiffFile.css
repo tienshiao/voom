@@ -117,6 +117,7 @@
   align-items: center;
   gap: 3px;
   color: var(--voom-accent-primary);
+  font-size: 12px;
 }
 
 .diff-content {
