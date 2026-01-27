@@ -1,4 +1,4 @@
-import { serve, type Server } from "bun";
+import { serve } from "bun";
 import index from "./index.html";
 import { createApiRoutes } from "./api/handlers/index";
 import { resolveGitRoot, NotAGitRepoError } from "./api/utils";
@@ -21,13 +21,30 @@ const DEFAULT_PORT = parseInt(process.env.PORT || "3010", 10);
 const MAX_PORT_ATTEMPTS = 10;
 const CLAUDE_CODE_MODE = !!process.env.CLAUDECODE;
 
-// Type guard for port-in-use errors
-function isAddressInUseError(error: unknown): boolean {
-  return (
-    error instanceof Error &&
-    "code" in error &&
-    (error as NodeJS.ErrnoException).code === "EADDRINUSE"
-  );
+// Check if a port is available by attempting to connect to it
+async function isPortInUse(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const socket = Bun.connect({
+      hostname: "localhost",
+      port,
+      socket: {
+        open(socket) {
+          // Connection succeeded - something is listening
+          socket.end();
+          resolve(true);
+        },
+        error() {
+          // Connection failed - port is available
+          resolve(false);
+        },
+        close() {},
+        data() {},
+      },
+    }).catch(() => {
+      // Connection refused - port is available
+      resolve(false);
+    });
+  });
 }
 
 (async () => {
@@ -62,22 +79,18 @@ function isAddressInUseError(error: unknown): boolean {
     },
   };
 
-  // Try to start server, falling back to next port if current is in use
-  function startServerWithPortFallback(startPort: number): Server<unknown> {
+  // Find an available port, then start the server
+  async function findAvailablePort(startPort: number): Promise<number> {
     let currentPort = startPort;
 
     for (let attempt = 0; attempt < MAX_PORT_ATTEMPTS; attempt++) {
-      try {
-        return serve({ ...serverConfig, port: currentPort });
-      } catch (error) {
-        if (isAddressInUseError(error)) {
-          if (!CLAUDE_CODE_MODE) {
-            console.warn(`Port ${currentPort} is in use, trying ${currentPort + 1}...`);
-          }
-          currentPort++;
-        } else {
-          throw error;
+      if (await isPortInUse(currentPort)) {
+        if (!CLAUDE_CODE_MODE) {
+          console.warn(`Port ${currentPort} is in use, trying ${currentPort + 1}...`);
         }
+        currentPort++;
+      } else {
+        return currentPort;
       }
     }
 
@@ -86,7 +99,8 @@ function isAddressInUseError(error: unknown): boolean {
     );
   }
 
-  const server = startServerWithPortFallback(DEFAULT_PORT);
+  const availablePort = await findAvailablePort(DEFAULT_PORT);
+  const server = serve({ ...serverConfig, port: availablePort });
 
   if (!CLAUDE_CODE_MODE) {
     if (server.port !== DEFAULT_PORT) {
