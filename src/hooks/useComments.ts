@@ -29,15 +29,29 @@ export function useComments() {
 
   const openComment = useCallback((filePath: string, lineNumber: number, lineType: string) => {
     const key = getCommentKey(filePath, lineNumber, lineType);
-    setActiveCommentLines((prev) => new Set(prev).add(key));
+    const existingComment = comments.get(key);
+    if (existingComment) {
+      // Edit existing comment instead of opening blank input
+      setActiveCommentLines((prev) => new Set(prev).add(key));
+      setEditingCommentId(existingComment.id);
+    } else {
+      setActiveCommentLines((prev) => new Set(prev).add(key));
+    }
     setDeleteConfirmId(null);
-  }, [getCommentKey]);
+  }, [getCommentKey, comments]);
 
   const openFileComment = useCallback((filePath: string) => {
     const key = getFileCommentKey(filePath);
-    setActiveCommentLines((prev) => new Set(prev).add(key));
+    const existingComment = comments.get(key);
+    if (existingComment) {
+      // Edit existing comment instead of opening blank input
+      setActiveCommentLines((prev) => new Set(prev).add(key));
+      setEditingCommentId(existingComment.id);
+    } else {
+      setActiveCommentLines((prev) => new Set(prev).add(key));
+    }
     setDeleteConfirmId(null);
-  }, [getFileCommentKey]);
+  }, [getFileCommentKey, comments]);
 
   const saveComment = useCallback((
     filePath: string,
