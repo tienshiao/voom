@@ -461,6 +461,7 @@ export function App() {
           viewedFiles={viewedFiles}
           totalAdditions={totalAdditions}
           totalDeletions={totalDeletions}
+          commentCounts={commentState.fileCommentCounts}
         />
         {!isMobile && !sidebarCollapsed && (
           <div className="sidebar-resize-handle" onMouseDown={handleResizeMouseDown} />
@@ -534,6 +535,9 @@ export function App() {
               disabled={commentState.comments.size === 0}
             >
               Prompt
+              {commentState.comments.size > 0 && (
+                <span className="comment-badge">{commentState.comments.size}</span>
+              )}
             </button>
           </div>
         </div>

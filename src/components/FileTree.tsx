@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { ChevronRight, ChevronDown, X } from "lucide-react";
+import { ChevronRight, ChevronDown, MessageCircle, X } from "lucide-react";
 import type { FileDiff } from "../types/diff";
 import { FileIcon } from "./FileIcon";
 import "./FileTree.css";
@@ -11,9 +11,10 @@ interface FileTreeProps {
   viewedFiles?: Set<string>;
   totalAdditions: number;
   totalDeletions: number;
+  commentCounts?: Map<string, number>;
 }
 
-export function FileTree({ files, selectedFile, onSelectFile, viewedFiles, totalAdditions, totalDeletions }: FileTreeProps) {
+export function FileTree({ files, selectedFile, onSelectFile, viewedFiles, totalAdditions, totalDeletions, commentCounts }: FileTreeProps) {
   const [filter, setFilter] = useState("");
   const [expandedPaths, setExpandedPaths] = useState<Set<string>>(new Set());
   const [hasInitialized, setHasInitialized] = useState(false);
@@ -132,10 +133,24 @@ export function FileTree({ files, selectedFile, onSelectFile, viewedFiles, total
               </span>
             )}
             {isFile && (
-              <span
-                className={`status-dot ${file?.status && file.status !== "modified" ? `status-${file.status}` : ""}`}
-                title={file?.status === "added" ? "Added" : file?.status === "deleted" ? "Deleted" : undefined}
-              />
+              <span className="tree-status-column">
+                {(() => {
+                  const count = commentCounts?.get(file?.newPath || "") || 0;
+                  if (count > 0) {
+                    return (
+                      <span className="stat-comment">
+                        <MessageCircle size={11} /> {count}
+                      </span>
+                    );
+                  }
+                  return (
+                    <span
+                      className={`status-dot ${file?.status && file.status !== "modified" ? `status-${file.status}` : ""}`}
+                      title={file?.status === "added" ? "Added" : file?.status === "deleted" ? "Deleted" : undefined}
+                    />
+                  );
+                })()}
+              </span>
             )}
           </div>
           {!isFile && isExpanded && renderTree(value, fullPath, depth + 1)}

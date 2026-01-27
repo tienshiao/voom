@@ -140,12 +140,29 @@
   font-weight: 500;
 }
 
+.stat-comment {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--voom-accent-primary);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.tree-status-column {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding-left: 4px;
+  min-width: 28px;
+}
+
 .status-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-left: 8px;
+  margin-left: 4px;
 }
 
 .status-added {

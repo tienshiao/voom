@@ -112,6 +112,13 @@
   font-weight: 500;
 }
 
+.file-stats .stat-comment {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--voom-accent-primary);
+}
+
 .diff-content {
   overflow-x: auto;
   overflow-y: hidden;

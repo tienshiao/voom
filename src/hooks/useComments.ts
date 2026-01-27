@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import type { LineComment } from "../types/diff";
 
 function generateUUID(): string {
@@ -157,6 +157,15 @@ export function useComments() {
     setDeleteConfirmId(null);
   }, []);
 
+  const fileCommentCounts = useMemo((): Map<string, number> => {
+    const counts = new Map<string, number>();
+    comments.forEach((comment) => {
+      const current = counts.get(comment.filePath) || 0;
+      counts.set(comment.filePath, current + 1);
+    });
+    return counts;
+  }, [comments]);
+
   return {
     comments,
     activeCommentLines,
@@ -173,6 +182,7 @@ export function useComments() {
     requestDelete,
     confirmDelete,
     cancelDelete,
+    fileCommentCounts,
   };
 }
 

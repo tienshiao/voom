@@ -1,5 +1,5 @@
-import React from "react";
-import { Check, ChevronDown, ChevronRight, ChevronUp, MessageSquare, MoreHorizontal, Plus, Square } from "lucide-react";
+import React, { useMemo } from "react";
+import { Check, ChevronDown, ChevronRight, ChevronUp, MessageCircle, MessageSquare, MoreHorizontal, Plus, Square } from "lucide-react";
 import { CommentInput } from "./CommentInput";
 import { CommentDisplay } from "./CommentDisplay";
 import { ImageDiff } from "./ImageDiff";
@@ -175,6 +175,12 @@ export function DiffFile({
   // Use newPath for file reading (handles new files from /dev/null)
   const filePath = file.newPath;
 
+  const fileCommentCount = useMemo(() => {
+    let count = 0;
+    comments.forEach((c) => { if (c.filePath === filePath) count++; });
+    return count;
+  }, [comments, filePath]);
+
   const getCommentKey = (lineNumber: number, lineType: string) => {
     return `${filePath}:${lineNumber}:${lineType}`;
   };
@@ -272,6 +278,11 @@ export function DiffFile({
         <span className="file-stats">
           <span className="stat-add">+{file.additions}</span>
           <span className="stat-del">-{file.deletions}</span>
+          {fileCommentCount > 0 && (
+            <span className="stat-comment">
+              <MessageCircle size={12} /> {fileCommentCount}
+            </span>
+          )}
         </span>
         <button
           className={`viewed-checkbox ${isViewed ? 'viewed-checkbox-checked' : ''}`}
