@@ -226,7 +226,7 @@ export function App() {
       const res = await fetch("/api/send-to-claude", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: "No feedback" }),
+        body: JSON.stringify({ prompt: "LGTM" }),
       });
       if (res.ok) {
         setNoFeedbackSent(true);
@@ -533,9 +533,9 @@ export function App() {
                 className="no-feedback-btn"
                 onClick={handleNoFeedback}
                 disabled={!isConnected}
-                title={!isConnected ? "Cannot send feedback while disconnected" : undefined}
+                title={!isConnected ? "Cannot send feedback while disconnected" : "Looks Good To Me"}
               >
-                No Feedback
+                LGTM
               </button>
             )}
             <button
@@ -643,7 +643,7 @@ export function App() {
               <svg width="48" height="48" viewBox="0 0 16 16" fill="#2da44e">
                 <path d="M8 16A8 8 0 1 1 8 0a8 8 0 0 1 0 16Zm3.78-9.72a.751.751 0 0 0-.018-1.042.751.751 0 0 0-1.042-.018L6.75 9.19 5.28 7.72a.751.751 0 0 0-1.042.018.751.751 0 0 0-.018 1.042l2 2a.75.75 0 0 0 1.06 0Z" />
               </svg>
-              <h2>No feedback sent to Claude Code</h2>
+              <h2>LGTM sent to Claude Code</h2>
               <p>You can close this tab now.</p>
             </div>
           </div>

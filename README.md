@@ -24,7 +24,7 @@ by Claude (my AI of choice).
 - Add comments on any line
 - Track files as viewed with progress indicator
 - Generate markdown prompts from comments for AI coding assistants
-- **No Feedback option** to exit without generating a prompt
+- **LGTM option** to exit without generating a prompt
 - Single-file mode for large diffs (auto-enabled for 30+ files or 1500+ changed lines, with keyboard navigation via ←/→)
 - Mobile-responsive design
 
