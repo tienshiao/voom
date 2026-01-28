@@ -5,9 +5,10 @@ interface PromptModalProps {
   prompt: string;
   onClose: () => void;
   claudeCodeMode?: boolean;
+  isConnected?: boolean;
 }
 
-export function PromptModal({ prompt, onClose, claudeCodeMode }: PromptModalProps) {
+export function PromptModal({ prompt, onClose, claudeCodeMode, isConnected = true }: PromptModalProps) {
   const [copied, setCopied] = useState(false);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
@@ -99,7 +100,12 @@ export function PromptModal({ prompt, onClose, claudeCodeMode }: PromptModalProp
               <button className="btn-secondary" onClick={handleCopy}>
                 {copied ? "Copied!" : "Copy to Clipboard"}
               </button>
-              <button className="btn-primary" onClick={handleSendToClaude} disabled={sending}>
+              <button
+                className="btn-primary"
+                onClick={handleSendToClaude}
+                disabled={sending || !isConnected}
+                title={!isConnected ? "Cannot send while disconnected from server" : undefined}
+              >
                 {sending ? "Sending..." : "Send to Claude Code"}
               </button>
             </>

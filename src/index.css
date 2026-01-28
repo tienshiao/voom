@@ -456,9 +456,50 @@ body {
   white-space: nowrap;
 }
 
-.no-feedback-btn:hover {
+.no-feedback-btn:hover:not(:disabled) {
   background: var(--voom-btn-default-hover);
   border-color: var(--voom-border-default);
+}
+
+.no-feedback-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Connection indicator - floating banner */
+.connection-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--voom-diff-del-text);
+  background: var(--voom-bg-secondary);
+  border: 1px solid var(--voom-diff-del-text);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px var(--voom-shadow-lg);
+  position: fixed;
+  top: 104px;
+  left: 50%;
+  transform: translateX(calc(-50% + 150px));
+  z-index: 100;
+  transition: transform 0.2s ease;
+}
+
+.connection-indicator::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  background: var(--voom-diff-del-text);
+  border-radius: 50%;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 /* Prompt button */
@@ -629,6 +670,11 @@ body {
   }
 
   .single-file-nav {
+    transform: translateX(-50%);
+    left: 50%;
+  }
+
+  .connection-indicator {
     transform: translateX(-50%);
     left: 50%;
   }

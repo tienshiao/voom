@@ -8,6 +8,7 @@ import { generatePrompt } from "./utils/generatePrompt";
 import { useComments } from "./hooks/useComments";
 import { useResizableSidebar } from "./hooks/useResizableSidebar";
 import { useTheme } from "./hooks/useTheme";
+import { useServerConnection } from "./hooks/useServerConnection";
 import type { DiffResponse, FileDiff, DiffHunk, HunkExpansionState, DiffLine } from "./types/diff";
 import { Menu, PanelLeftClose, Sun, Moon } from "lucide-react";
 import "./index.css";
@@ -24,6 +25,7 @@ export function App() {
   const [showPromptModal, setShowPromptModal] = useState(false);
   const [claudeCodeMode, setClaudeCodeMode] = useState(false);
   const [noFeedbackSent, setNoFeedbackSent] = useState(false);
+  const [diffHash, setDiffHash] = useState<string | null>(null);
   const commentState = useComments();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const isScrollingToFile = useRef(false);
@@ -43,6 +45,10 @@ export function App() {
   } = useResizableSidebar();
 
   const { theme, resolvedTheme, cycleTheme } = useTheme();
+
+  const { status: connectionStatus, isConnected } = useServerConnection(diffHash, {
+    enabled: claudeCodeMode,
+  });
 
   // Thresholds for auto-enabling single-file mode
   const FILE_COUNT_THRESHOLD = 30;
@@ -116,6 +122,7 @@ export function App() {
       }
 
       setDiffData(data);
+      setDiffHash(data.hash);
       const parsed = parseDiff(data.diff);
       const enhanced = enhanceWithWordDiff(parsed);
       // Sort files by path to match tree rendering order
@@ -525,6 +532,8 @@ export function App() {
               <button
                 className="no-feedback-btn"
                 onClick={handleNoFeedback}
+                disabled={!isConnected}
+                title={!isConnected ? "Cannot send feedback while disconnected" : undefined}
               >
                 No Feedback
               </button>
@@ -610,12 +619,21 @@ export function App() {
             </button>
           </div>
         )}
+        {claudeCodeMode && !isConnected && (
+          <div
+            className="connection-indicator"
+            style={!isMobile ? { transform: `translateX(calc(-50% + ${sidebarCollapsed ? 0 : sidebarWidth / 2}px))` } : undefined}
+          >
+            {connectionStatus === "hash-mismatch" ? "Diff changed" : "Disconnected"}
+          </div>
+        )}
       </div>
       {showPromptModal && (
         <PromptModal
           prompt={generatePrompt({ comments: commentState.comments, files, hunkExpansions })}
           onClose={() => setShowPromptModal(false)}
           claudeCodeMode={claudeCodeMode}
+          isConnected={isConnected}
         />
       )}
       {noFeedbackSent && (

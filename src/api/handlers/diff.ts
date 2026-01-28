@@ -24,9 +24,11 @@ export function createDiffHandler(targetDir: string) {
     async GET() {
       try {
         const diff = await getFullDiff(targetDir);
+        const hash = Bun.hash(diff).toString(16);
         return Response.json({
           diff,
           directory: targetDir,
+          hash,
         });
       } catch (error) {
         return Response.json(
@@ -34,6 +36,26 @@ export function createDiffHandler(targetDir: string) {
             error: "Failed to get git diff",
             message: error instanceof Error ? error.message : String(error),
             directory: targetDir,
+          },
+          { status: 500 }
+        );
+      }
+    },
+  };
+}
+
+export function createStatusHandler(targetDir: string) {
+  return {
+    async GET() {
+      try {
+        const diff = await getFullDiff(targetDir);
+        const hash = Bun.hash(diff).toString(16);
+        return Response.json({ hash });
+      } catch (error) {
+        return Response.json(
+          {
+            error: "Failed to get status",
+            message: error instanceof Error ? error.message : String(error),
           },
           { status: 500 }
         );

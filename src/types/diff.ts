@@ -1,6 +1,7 @@
 export interface DiffResponse {
   diff: string;
   directory: string;
+  hash: string;
 }
 
 export type SyntaxTokenType =
