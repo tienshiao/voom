@@ -46,7 +46,7 @@ export function App() {
 
   const { theme, resolvedTheme, cycleTheme } = useTheme();
 
-  const { status: connectionStatus, isConnected } = useServerConnection(diffHash, {
+  const { isConnected, hasDiffChanged } = useServerConnection(diffHash, {
     enabled: claudeCodeMode,
   });
 
@@ -619,12 +619,12 @@ export function App() {
             </button>
           </div>
         )}
-        {claudeCodeMode && !isConnected && (
+        {claudeCodeMode && (hasDiffChanged || !isConnected) && (
           <div
             className="connection-indicator"
             style={!isMobile ? { transform: `translateX(calc(-50% + ${sidebarCollapsed ? 0 : sidebarWidth / 2}px))` } : undefined}
           >
-            {connectionStatus === "hash-mismatch" ? "Diff changed" : "Disconnected"}
+            {hasDiffChanged ? "Diff changed" : "Disconnected"}
           </div>
         )}
       </div>

@@ -11,6 +11,7 @@ interface UseServerConnectionOptions {
 interface UseServerConnectionResult {
   status: ConnectionStatus;
   isConnected: boolean;
+  hasDiffChanged: boolean;
   lastError: string | null;
 }
 
@@ -75,7 +76,8 @@ export function useServerConnection(
 
   return {
     status,
-    isConnected: status === "connected",
+    isConnected: status !== "disconnected",
+    hasDiffChanged: status === "hash-mismatch",
     lastError,
   };
 }
